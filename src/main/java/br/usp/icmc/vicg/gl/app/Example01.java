@@ -24,7 +24,7 @@ public class Example01 implements GLEventListener {
     public static final String SHADERS_FOLDER = "shaders/1/";
     
     // Triangle
-    private static final float[] TIRANGLE_VERTICES = new float[] {
+    private static final float[] TRIANGLE_VERTICES = new float[] {
         -0.5f, -0.5f, 0.0f, 
         0.5f, -0.5f, 0.0f, 
         0.0f, 0.5f, 0.0f,
@@ -79,8 +79,8 @@ public class Example01 implements GLEventListener {
         vbo = new int[1];
         gl.glGenBuffers(1, vbo, 0);
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);
-        gl.glBufferData(GL3.GL_ARRAY_BUFFER, TIRANGLE_VERTICES.length * Buffers.SIZEOF_FLOAT,
-                Buffers.newDirectFloatBuffer(TIRANGLE_VERTICES), GL3.GL_STATIC_DRAW);
+        gl.glBufferData(GL3.GL_ARRAY_BUFFER, TRIANGLE_VERTICES.length * Buffers.SIZEOF_FLOAT,
+                Buffers.newDirectFloatBuffer(TRIANGLE_VERTICES), GL3.GL_STATIC_DRAW);
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
 
         // pass buffer to shader program
@@ -95,7 +95,7 @@ public class Example01 implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         
-        gl.glDrawArrays(GL3.GL_TRIANGLES, 0, TIRANGLE_VERTICES.length / 3);
+        gl.glDrawArrays(GL3.GL_TRIANGLES, 0, TRIANGLE_VERTICES.length / 3);
         
         gl.glFlush();
     }
