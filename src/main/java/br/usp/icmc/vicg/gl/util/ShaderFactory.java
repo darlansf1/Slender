@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package br.usp.icmc.vicg.gl.util;
 
 /**
@@ -10,16 +11,22 @@ package br.usp.icmc.vicg.gl.util;
  */
 public class ShaderFactory {
 
-  public enum ShaderType {
+    public enum ShaderImplementation {
 
-    SIMPLE_SHADER 
-  };
+        SIMPLE_VERTEX_SHADER,
+        SIMPLE_FRAGMENT_SHADER,
+        TRANSFORM_VERTEX_SHADER
+    };
 
-  public static Shader getInstance(ShaderType type) {
-    if (type == ShaderType.SIMPLE_SHADER) {
-      return new Shader("simple_vertex.glsl",
-              "simple_fragment.glsl", null, null, null);
+    public static Shader getInstance(ShaderImplementation type) {
+        if (type == ShaderImplementation.SIMPLE_VERTEX_SHADER) {
+            return new Shader("simple_vertex.glsl", Shader.ShaderType.GL_VERTEX_SHADER);
+        } else if (type == ShaderImplementation.SIMPLE_FRAGMENT_SHADER) {
+            return new Shader("simple_fragment.glsl", Shader.ShaderType.GL_FRAGMENT_SHADER);
+        } else if (type == ShaderImplementation.TRANSFORM_VERTEX_SHADER) {
+            return new Shader("transform_vertex.glsl", Shader.ShaderType.GL_VERTEX_SHADER);
+        }
+        return null;
     }
-    return null;
-  }
+
 }
