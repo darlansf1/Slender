@@ -16,15 +16,21 @@ public class Shader {
   private String[] shaders_filenames = new String[5];
   private GL3 gl = null;
   private int handle = -1;
-  public static final int[] TYPES = new int[]{
+  
+  public static final int[] TYPES = new int[] {
     GL3.GL_VERTEX_SHADER,
     GL3.GL_FRAGMENT_SHADER,
     GL3.GL_GEOMETRY_SHADER,
     GL3.GL_TESS_CONTROL_SHADER,
     GL3.GL_TESS_EVALUATION_SHADER
   };
+  
+  public Shader(String vertex, String fragment) {
+    this(vertex, fragment, null, null, null);
+  }
 
-  public Shader(String vertex, String fragment, String geometry, String tessControl, String tessEval) {
+  public Shader(String vertex, String fragment, String geometry, 
+          String tessControl, String tessEval) {
     this.shaders_filenames[0] = vertex;
     this.shaders_filenames[1] = fragment;
     this.shaders_filenames[2] = geometry;

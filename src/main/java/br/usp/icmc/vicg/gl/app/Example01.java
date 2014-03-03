@@ -21,12 +21,12 @@ import com.jogamp.opengl.util.FPSAnimator;
 
 public class Example01 implements GLEventListener {
 
-  private Shader shader; // Shaders Manager
+  private final Shader shader; // Gerenciador dos shaders
   private int[] vbo; // Vertex Buffer Object
-  private int nr_vertices;  //Number of vertices on the VBO
+  private int nr_vertices;  // Numero de vertices no VBO
 
   public Example01() {
-    // Load shaders
+    // Carrega os shaders
     shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.SIMPLE_SHADER);
   }
 
@@ -38,26 +38,30 @@ public class Example01 implements GLEventListener {
     // Print OpenGL version
     System.out.println("OpenGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n");
 
-    // Set background color
-    gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    gl.glClearColor(0, 0, 0, 0);
 
-    // Start and activate the shader
+    //inicializa os shaders
     shader.init(gl);
+
+    //ativa os shaders
     shader.bind();
 
-    //create the object
+    //cria o objeto a ser desenhado
     nr_vertices = create_object(gl);
   }
 
   @Override
   public void display(GLAutoDrawable drawable) {
-    // Get pipeline
+    // Recupera o pipeline
     GL3 gl = drawable.getGL().getGL3();
 
+    // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
-    gl.glDrawArrays(GL3.GL_POINTS, 0, nr_vertices);
+    // Desenha o buffer carregado em memória (triangulos)
+    gl.glDrawArrays(GL3.GL_TRIANGLES, 0, nr_vertices);
 
+    // Força execução das operações declaradas
     gl.glFlush();
   }
 
@@ -67,9 +71,10 @@ public class Example01 implements GLEventListener {
 
   @Override
   public void dispose(GLAutoDrawable drawable) {
-    // Get pipeline
+    // Recupera o pipeline
     GL3 gl = drawable.getGL().getGL3();
 
+    // Apaga o buffer
     gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
     if (vbo[0] > 0) {
       gl.glDeleteBuffers(1, vbo, 0);
@@ -102,9 +107,6 @@ public class Example01 implements GLEventListener {
   }
 
   public static void main(String[] args) {
-    // Run example
-    Example01 example01 = new Example01();
-
     // Get GL3 profile (to work with OpenGL 4.0)
     GLProfile profile = GLProfile.get(GLProfile.GL3);
 
@@ -117,7 +119,7 @@ public class Example01 implements GLEventListener {
     GLCanvas glCanvas = new GLCanvas(glcaps);
 
     // Add listener to panel
-    glCanvas.addGLEventListener(example01);
+    glCanvas.addGLEventListener(new Example01());
 
     Frame frame = new Frame("Example 01");
     frame.setSize(800, 600);
