@@ -122,7 +122,7 @@ public class Example01 implements GLEventListener {
     glCanvas.addGLEventListener(new Example01());
 
     Frame frame = new Frame("Example 01");
-    frame.setSize(800, 600);
+    frame.setSize(600, 600);
     frame.add(glCanvas);
     final AnimatorBase animator = new FPSAnimator(glCanvas, 60);
 
