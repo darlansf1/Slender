@@ -1,59 +1,51 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package br.usp.icmc.vicg.gl.model;
 
 /**
  *
- * @author paulovich
+ * @author PC
  */
 public class Sphere extends Model {
 
-  private final static int MAX_ELEMENTS = 4096;
+    private final int lats;
+    private final int longs;
+    private final float radius;
 
-  public Sphere(float radius, int numberSlices) {
+    public Sphere() {
+        this.radius = 1;
+        this.lats = 40;
+        this.longs = 40;
 
-    if (numberSlices < 3 || numberSlices > MAX_ELEMENTS) {
-      numberSlices = 3;
+        vertices = new float[(lats + 1) * (longs + 1) * 6];
+
+        int i, j, k;
+        for (i = 0, k = -1; i <= lats; i++) {
+            float lat0 = (float) (Math.PI * (-0.5f + (float) (i - 1) / lats));
+            float z0 = (float) Math.sin(lat0);
+            float zr0 = (float) Math.cos(lat0);
+
+            float lat1 = (float) (Math.PI * (-0.5f + (float) i / lats));
+            float z1 = (float) Math.sin(lat1);
+            float zr1 = (float) Math.cos(lat1);
+
+            for (j = 0; j <= longs; j++) {
+                float lng = (float) (2 * Math.PI * (float) (j - 1) / longs);
+                float x = (float) Math.cos(lng);
+                float y = (float) Math.sin(lng);
+                
+                vertices[++k] = x * zr0 * radius;
+                vertices[++k] = y * zr0 * radius;
+                vertices[++k] = z0 * radius;
+                
+                vertices[++k] = x * zr1 * radius;
+                vertices[++k] = y * zr1 * radius;
+                vertices[++k] = z1 * radius;
+            }
+        }
     }
-
-    int numberParallels = numberSlices / 2;
-    int numberVertices = (numberParallels + 1) * (numberSlices + 1);
-    int numberIndices = numberParallels * numberSlices * 6;
-
-    float angleStep = (float) ((2.0f * Math.PI) / ((float) numberSlices));
-
-    int indexIndices;
-
-    positions = new float[3 * numberVertices];
-    indices = new int[numberIndices];
-
-    for (int i = 0; i < numberParallels + 1; i++) {
-      for (int j = 0; j < numberSlices + 1; j++) {
-
-        int vertexIndex = (i * (numberSlices + 1) + j) * 3;
-        int normalIndex = (i * (numberSlices + 1) + j) * 3;
-        int texCoordsIndex = (i * (numberSlices + 1) + j) * 2;
-
-        positions[vertexIndex + 0] = (float) (radius * Math.sin(angleStep * (float) i) * Math.sin(angleStep * (float) j));
-        positions[vertexIndex + 1] = (float) (radius * Math.cos(angleStep * (float) i));
-        positions[vertexIndex + 2] = (float) (radius * Math.sin(angleStep * (float) i) * Math.cos(angleStep * (float) j));
-      }
-    }
-
-    indexIndices = 0;
-    for (int i = 0; i < numberParallels; i++) {
-      for (int j = 0; j < numberSlices; j++) {
-
-        indices[indexIndices++] = i * (numberSlices + 1) + j;
-        indices[indexIndices++] = (i + 1) * (numberSlices + 1) + j;
-        indices[indexIndices++] = (i + 1) * (numberSlices + 1) + (j + 1);
-
-        indices[indexIndices++] = i * (numberSlices + 1) + j;
-        indices[indexIndices++] = (i + 1) * (numberSlices + 1) + (j + 1);
-        indices[indexIndices++] = i * (numberSlices + 1) + (j + 1);
-      }
-    }
-  }
 }

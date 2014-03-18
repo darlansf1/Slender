@@ -2,8 +2,9 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
-import br.usp.icmc.vicg.gl.model.MyModel;
-import br.usp.icmc.vicg.gl.model.MyTriangle;
+import br.usp.icmc.vicg.gl.model.Model;
+import br.usp.icmc.vicg.gl.model.Square;
+import br.usp.icmc.vicg.gl.model.Triangle;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -26,13 +27,15 @@ public class Example02 implements GLEventListener {
 
     private final Shader shader; // Gerenciador dos shaders
     private final Matrix4 modelMatrix;
-    private final MyModel triangle;
+    private final Model triangle;
+    private final Model square;
 
     public Example02() {
         // Carrega os shaders
         shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.MATRIX_SHADER);
         modelMatrix = new Matrix4();
-        triangle = new MyTriangle();
+        triangle = new Triangle();
+        square = new Square();
     }
 
     @Override
@@ -56,6 +59,7 @@ public class Example02 implements GLEventListener {
 
         //cria o objeto a ser desenhado
         triangle.init(gl, shader.getAttribLocation("a_position"));
+        square.init(gl, shader.getAttribLocation("a_position"));
     }
 
     @Override
@@ -72,7 +76,16 @@ public class Example02 implements GLEventListener {
         modelMatrix.bind();
 
         // Desenha o buffer carregado em memória (triangulos)
-        triangle.draw(GL3.GL_TRIANGLES);
+        triangle.bind();
+        triangle.draw(GL3.GL_TRIANGLES);        
+        
+        modelMatrix.loadIdentity();
+        modelMatrix.translate(-0.75f, 0, 0);
+        modelMatrix.scale(0.25f, 0.25f, 1);
+        modelMatrix.bind();
+        
+        square.bind();
+        square.draw(GL3.GL_TRIANGLE_FAN);
 
         // Força execução das operações declaradas
         gl.glFlush();

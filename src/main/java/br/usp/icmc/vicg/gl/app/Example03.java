@@ -2,8 +2,9 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
-import br.usp.icmc.vicg.gl.model.MyModel;
-import br.usp.icmc.vicg.gl.model.MyTriangle;
+import br.usp.icmc.vicg.gl.model.Model;
+import br.usp.icmc.vicg.gl.model.Square;
+import br.usp.icmc.vicg.gl.model.Triangle;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -28,7 +29,7 @@ public class Example03 extends KeyAdapter implements GLEventListener {
 
     private final Shader shader; // Gerenciador dos shaders
     private final Matrix4 modelMatrix;
-    private final MyModel triangle;
+    private final Model triangle;
 
     private float tx = 0;
     private float ty = 0;
@@ -38,7 +39,7 @@ public class Example03 extends KeyAdapter implements GLEventListener {
         // Carrega os shaders
         shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.MATRIX_SHADER);
         modelMatrix = new Matrix4();
-        triangle = new MyTriangle();
+        triangle = new Triangle();
     }
 
     @Override
@@ -78,8 +79,9 @@ public class Example03 extends KeyAdapter implements GLEventListener {
         modelMatrix.bind();
 
         // Desenha o buffer carregado em memória (triangulos)
+        triangle.bind();
         triangle.draw(GL3.GL_TRIANGLES);
-
+        
         // Força execução das operações declaradas
         gl.glFlush();
     }
