@@ -14,7 +14,8 @@ public class ShaderFactory {
 
     SIMPLE_SHADER,
     TRANSFORM_SHADER,
-    MATRIX_SHADER
+    MODEL_MATRIX_SHADER,
+    MODEL_PROJECTION_MATRIX_SHADER
   };
 
   public static Shader getInstance(ShaderType type) {
@@ -22,8 +23,10 @@ public class ShaderFactory {
       return new Shader("simple_vertex.glsl", "simple_fragment.glsl");
     } else if (type == ShaderType.TRANSFORM_SHADER) {
       return new Shader("transform_vertex.glsl", "simple_fragment.glsl");
-    } else if (type == ShaderType.MATRIX_SHADER) {
-      return new Shader("mat_vertex.glsl", "simple_fragment.glsl");
+    } else if (type == ShaderType.MODEL_MATRIX_SHADER) {
+      return new Shader("model_vertex.glsl", "simple_fragment.glsl");
+    } else if (type == ShaderType.MODEL_PROJECTION_MATRIX_SHADER) {
+      return new Shader("model_projection_vertex.glsl", "simple_fragment.glsl");
     }
     return null;
   }

@@ -32,7 +32,7 @@ public class Example02 implements GLEventListener {
 
     public Example02() {
         // Carrega os shaders
-        shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.MATRIX_SHADER);
+        shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.MODEL_MATRIX_SHADER);
         modelMatrix = new Matrix4();
         triangle = new Triangle();
         square = new Square();

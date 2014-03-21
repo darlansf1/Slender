@@ -3,8 +3,7 @@ package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
 import br.usp.icmc.vicg.gl.model.Model;
-import br.usp.icmc.vicg.gl.model.Square;
-import br.usp.icmc.vicg.gl.model.Triangle;
+import br.usp.icmc.vicg.gl.model.Sphere;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -37,9 +36,9 @@ public class Example03 extends KeyAdapter implements GLEventListener {
 
     public Example03() {
         // Carrega os shaders
-        shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.MATRIX_SHADER);
+        shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.MODEL_MATRIX_SHADER);
         modelMatrix = new Matrix4();
-        triangle = new Triangle();
+        triangle = new Sphere();
     }
 
     @Override
@@ -80,7 +79,7 @@ public class Example03 extends KeyAdapter implements GLEventListener {
 
         // Desenha o buffer carregado em memória (triangulos)
         triangle.bind();
-        triangle.draw(GL3.GL_TRIANGLES);
+        triangle.draw(GL3.GL_LINE_LOOP);
         
         // Força execução das operações declaradas
         gl.glFlush();
@@ -137,7 +136,7 @@ public class Example03 extends KeyAdapter implements GLEventListener {
         Example03 listener = new Example03();
         glCanvas.addGLEventListener(listener);
 
-        Frame frame = new Frame("Example 02");
+        Frame frame = new Frame("Example 03");
         frame.setSize(600, 600);
         frame.add(glCanvas);
         frame.addKeyListener(listener);
