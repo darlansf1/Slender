@@ -6,6 +6,8 @@
 
 package br.usp.icmc.vicg.gl.model;
 
+import javax.media.opengl.GL;
+
 /**
  *
  * @author PC
@@ -47,5 +49,10 @@ public class Sphere extends Model {
                 vertices[++k] = z1 * radius;
             }
         }
+    }
+
+    @Override
+    public void draw() {
+        draw(GL.GL_LINE_LOOP);
     }
 }

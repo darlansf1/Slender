@@ -6,6 +6,8 @@
 
 package br.usp.icmc.vicg.gl.model;
 
+import javax.media.opengl.GL;
+
 /**
  *
  * @author PC
@@ -19,5 +21,9 @@ public class Triangle extends Model {
             0.5f, -0.5f, 0.0f,
             0.0f, 0.5f, 0.0f,};
     }
-
+    
+    @Override
+    public void draw() {
+        draw(GL.GL_LINE_LOOP);
+    }
 }

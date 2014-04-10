@@ -13,12 +13,14 @@ import javax.media.opengl.GL3;
  *
  * @author PC
  */
-public class Model {
+public abstract class Model {
 
     private GL3 gl;
     private int handle;
     private int[] vbo; // Vertex Buffer Object
     protected float[] vertices;
+    
+    public abstract void draw();
 
     public void draw(int primitive) {
         // Desenha o buffer carregado em memória (triangulos)
