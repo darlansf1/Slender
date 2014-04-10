@@ -10,14 +10,13 @@ package br.usp.icmc.vicg.gl.model;
  *
  * @author PC
  */
-public class Triangle extends Model {
+public class Square extends Model {
 
-    public Triangle() {
-        // Triangle
-        vertices = new float[]{
-            -0.5f, -0.5f, 0.0f,
+    public Square() {
+        vertices = new float[]{-0.5f, -0.5f, 0.0f,
             0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f,};
+            0.5f, 0.5f, 0.0f,
+            -0.5f, 0.5f, 0.0f};
     }
 
 }

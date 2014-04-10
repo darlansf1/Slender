@@ -1,5 +1,8 @@
 package br.usp.icmc.vicg.gl.app;
 
+import br.usp.icmc.vicg.gl.matrix.Matrix4;
+import br.usp.icmc.vicg.gl.model.Model;
+import br.usp.icmc.vicg.gl.model.Triangle;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -15,19 +18,22 @@ import javax.media.opengl.awt.GLCanvas;
 import br.usp.icmc.vicg.gl.util.Shader;
 import br.usp.icmc.vicg.gl.util.ShaderFactory;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
 
-public class Example01 implements GLEventListener {
+public class Example04 implements GLEventListener {
 
   private final Shader shader; // Gerenciador dos shaders
-  private int[] vbo; // Vertex Buffer Object
-  private int nr_vertices;  // Numero de vertices no VBO
+  private final Matrix4 modelMatrix;
+  private final Matrix4 projectionMatrix;
+  private final Model triangle;
 
-  public Example01() {
+  public Example04() {
     // Carrega os shaders
-    shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.SIMPLE_SHADER);
+    shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.MODEL_PROJECTION_MATRIX_SHADER);
+    modelMatrix = new Matrix4();
+    projectionMatrix = new Matrix4();
+    triangle = new Triangle();
   }
 
   @Override
@@ -46,8 +52,17 @@ public class Example01 implements GLEventListener {
     //ativa os shaders
     shader.bind();
 
+    //inicializa a matrix Model and Projection
+    modelMatrix.init(gl, shader.getUniformLocation("u_modelMatrix"));
+    projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
+
     //cria o objeto a ser desenhado
-    nr_vertices = create_object(gl);
+    triangle.init(gl, shader.getAttribLocation("a_position"));
+
+    //cria a projecao 2D
+    projectionMatrix.loadIdentity();
+    projectionMatrix.ortho2D(-0.501f, 0.501f, -0.501f, 0.501f);
+    projectionMatrix.bind();
   }
 
   @Override
@@ -58,8 +73,16 @@ public class Example01 implements GLEventListener {
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
-    // Desenha o buffer carregado em memória (triangulos)
-    gl.glDrawArrays(GL3.GL_TRIANGLES, 0, nr_vertices);
+    modelMatrix.loadIdentity();
+    modelMatrix.bind();
+
+    gl.glViewport(0, 0, 600, 575);
+    triangle.bind();
+    triangle.draw(GL3.GL_LINE_LOOP);
+
+    gl.glViewport(0, 475, 100, 100);
+    triangle.bind();
+    triangle.draw(GL3.GL_LINE_LOOP);
 
     // Força execução das operações declaradas
     gl.glFlush();
@@ -71,39 +94,8 @@ public class Example01 implements GLEventListener {
 
   @Override
   public void dispose(GLAutoDrawable drawable) {
-    // Recupera o pipeline
-    GL3 gl = drawable.getGL().getGL3();
-
     // Apaga o buffer
-    gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
-    if (vbo[0] > 0) {
-      gl.glDeleteBuffers(1, vbo, 0);
-      vbo[0] = 0;
-    }
-  }
-
-  private int create_object(GL3 gl) {
-    // Triangle
-    float[] TRIANGLE_VERTICES = new float[]{
-      -0.5f, -0.5f, 0.0f,
-      0.5f, -0.5f, 0.0f,
-      0.0f, 0.5f, 0.0f,};
-
-    // create vertex positions buffer
-    vbo = new int[1];
-    gl.glGenBuffers(1, vbo, 0);
-    gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);
-    gl.glBufferData(GL3.GL_ARRAY_BUFFER, TRIANGLE_VERTICES.length * Buffers.SIZEOF_FLOAT,
-            Buffers.newDirectFloatBuffer(TRIANGLE_VERTICES), GL3.GL_STATIC_DRAW);
-    gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
-
-    // pass buffer to shader program
-    int vertexPositions = shader.getAttribLocation("a_position");
-    gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);
-    gl.glVertexAttribPointer(vertexPositions, 3, GL3.GL_FLOAT, false, 0, 0);
-    gl.glEnableVertexAttribArray(vertexPositions);
-
-    return TRIANGLE_VERTICES.length / 3;
+    triangle.dispose();
   }
 
   public static void main(String[] args) {
@@ -119,9 +111,10 @@ public class Example01 implements GLEventListener {
     GLCanvas glCanvas = new GLCanvas(glcaps);
 
     // Add listener to panel
-    glCanvas.addGLEventListener(new Example01());
+    Example04 listener = new Example04();
+    glCanvas.addGLEventListener(listener);
 
-    Frame frame = new Frame("Example 01");
+    Frame frame = new Frame("Example 04");
     frame.setSize(600, 600);
     frame.add(glCanvas);
     final AnimatorBase animator = new FPSAnimator(glCanvas, 60);
