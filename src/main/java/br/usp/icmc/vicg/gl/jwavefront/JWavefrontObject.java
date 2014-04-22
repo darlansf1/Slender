@@ -27,45 +27,13 @@ import javax.media.opengl.GLProfile;
  */
 public class JWavefrontObject {
 
-    /**
-     * *****
-     */
-    private int[] vaos;
-    private Shader shader;
+    private int[] vao;
     private GL3 gl;
-    private br.usp.icmc.vicg.gl.core.Material mat;
-    /**
-     * *****
-     */
-
-    /**
-     * render with only vertices
-     */
-    public static final int WF_NONE = 0;
-    /**
-     * render with facet normals
-     */
-    public static final int WF_FLAT = 1;
-    /**
-     * render with vertex normals
-     */
-    public static final int WF_SMOOTH = (1 << 1);
-    /**
-     * render with texture coords
-     */
-    public static final int WF_TEXTURE = (1 << 2);
-    /**
-     * render with colors
-     */
-    public static final int WF_COLOR = (1 << 3);
-    /**
-     * render with materials
-     */
-    public static final int WF_MATERIAL = (1 << 4);
-    /*
-     * attributes
-     */
-    private int mode;
+    private br.usp.icmc.vicg.gl.core.Material material;
+    private int vertex_positions_handle;
+    private int vertex_normals_handle;
+    private int vertex_textures_handle;
+    
     private ArrayList<Group> groups;
     private ArrayList<Vertex> vertices;
     private ArrayList<Normal> normals;
@@ -108,21 +76,23 @@ public class JWavefrontObject {
         materials = new ArrayList<Material>();
         textures = new ArrayList<Texture>();
 
-        mode = -1;
         pathname = file;
         current_group = null;
         parse(file);
     }
 
     public void init(GL3 gl, Shader shader) {
-        this.shader = shader;
         this.gl = gl;
 
-        this.mat = new br.usp.icmc.vicg.gl.core.Material();
-        mat.init(gl, shader.getUniformLocation("u_material.ambientColor"),
+        this.material = new br.usp.icmc.vicg.gl.core.Material();
+        this.material.init(gl, shader.getUniformLocation("u_material.ambientColor"),
                 shader.getUniformLocation("u_material.diffuseColor"),
                 shader.getUniformLocation("u_material.specularColor"),
                 shader.getUniformLocation("u_material.specularExponent"));
+
+        this.vertex_positions_handle = shader.getAttribLocation("a_position");
+        this.vertex_normals_handle = shader.getAttribLocation("a_normal");
+        this.vertex_textures_handle = shader.getAttribLocation("a_texture");
     }
 
     /**
@@ -747,25 +717,24 @@ public class JWavefrontObject {
      * WF_SMOOTH should not both be specified.
      */
     public void draw() {
-        if (vaos == null) {
-            create_vaos();
+        if (vao == null) {
+            create_vao();
         } else {
-
             for (int i = 0; i < groups.size(); i++) {
                 Group group = groups.get(i);
                 if (group.triangles.isEmpty()) {
                     continue;
                 }
 
-                if (mat != null) {
-                    mat.setAmbientColor(group.material.ambient);
-                    mat.setDiffuseColor(group.material.diffuse);
-                    mat.setSpecularColor(group.material.specular);
-                    mat.setSpecularExponent(group.material.shininess);
-                    mat.bind();
+                if (group.material != null) {
+                    material.setAmbientColor(group.material.ambient);
+                    material.setDiffuseColor(group.material.diffuse);
+                    material.setSpecularColor(group.material.specular);
+                    material.setSpecularExponent(group.material.shininess);
+                    material.bind();
                 }
 
-                gl.glBindVertexArray(vaos[i]);
+                gl.glBindVertexArray(vao[i]);
                 gl.glDrawArrays(GL.GL_TRIANGLES, 0, 3 * group.triangles.size());
             }
 
@@ -774,17 +743,20 @@ public class JWavefrontObject {
     }
 
     public void dispose() {
-        gl.glDeleteVertexArrays(vaos.length, vaos, 0);
+        gl.glDeleteVertexArrays(vao.length, vao, 0);
         gl.glBindVertexArray(0);
     }
 
-    private void create_vaos() {
+    private void create_vao() {
         /* create one vao per group of vertex */
-        vaos = new int[groups.size()];
-        int vertex_positions = shader.getAttribLocation("a_position");
-        int vertex_normals = shader.getAttribLocation("a_normal");
+        vao = new int[groups.size()];
 
-        gl.glGenVertexArrays(vaos.length, vaos, 0);
+        gl.glGenVertexArrays(vao.length, vao, 0);
+
+        //if the normals are not given per vertex, calculate it
+        if (normals.isEmpty()) {
+            calculate_vertex_normals();
+        }
 
         for (int i = 0; i < groups.size(); i++) {
             Group group = groups.get(i);
@@ -792,10 +764,11 @@ public class JWavefrontObject {
                 continue;
             }
 
-            gl.glBindVertexArray(vaos[i]); // Bind our Vertex Array Object so we can use it            
+            gl.glBindVertexArray(vao[i]); // Bind our Vertex Array Object so we can use it            
 
             float[] vertex_buffer = new float[9 * group.triangles.size()];
             float[] normal_buffer = new float[9 * group.triangles.size()];
+            float[] texture_buffer = new float[6 * group.triangles.size()];
 
             for (int j = 0; j < group.triangles.size(); j++) {
                 Triangle triangle = group.triangles.get(j);
@@ -808,29 +781,42 @@ public class JWavefrontObject {
                     normal_buffer[(9 * j) + (3 * k)] = triangle.vertex_normals[k].x;
                     normal_buffer[(9 * j) + (3 * k) + 1] = triangle.vertex_normals[k].y;
                     normal_buffer[(9 * j) + (3 * k) + 2] = triangle.vertex_normals[k].z;
+
+                    if (triangle.vertex_tex_coords[k] != null) {
+                        texture_buffer[(6 * j) + (2 * k)] = triangle.vertex_tex_coords[k].u;
+                        texture_buffer[(6 * j) + (2 * k) + 1] = triangle.vertex_tex_coords[k].v;
+                    }
                 }
             }
 
-            int[] vbo = new int[2];
-            gl.glGenBuffers(2, vbo, 0); // Generate two Vertex Buffer Object
+            int[] vbo = new int[3];
+            gl.glGenBuffers(3, vbo, 0); // Generate two Vertex Buffer Object
 
-            ////////////////
+            //the positions buffer
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbo[0]); // Bind vertex buffer 
             gl.glBufferData(GL3.GL_ARRAY_BUFFER, vertex_buffer.length * Buffers.SIZEOF_FLOAT,
                     Buffers.newDirectFloatBuffer(vertex_buffer), GL3.GL_STATIC_DRAW);
-            gl.glEnableVertexAttribArray(vertex_positions);
-            gl.glVertexAttribPointer(vertex_positions, 3, GL3.GL_FLOAT, false, 0, 0);
+            gl.glEnableVertexAttribArray(vertex_positions_handle);
+            gl.glVertexAttribPointer(vertex_positions_handle, 3, GL3.GL_FLOAT, false, 0, 0);
             gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
-            ////////////////
 
-            ////////////////
+            //the normals buffer
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbo[1]); // Bind normals buffer
             gl.glBufferData(GL3.GL_ARRAY_BUFFER, normal_buffer.length * Buffers.SIZEOF_FLOAT,
                     Buffers.newDirectFloatBuffer(normal_buffer), GL3.GL_STATIC_DRAW);
-            gl.glEnableVertexAttribArray(vertex_normals);
-            gl.glVertexAttribPointer(vertex_normals, 3, GL3.GL_FLOAT, false, 0, 0);
+            gl.glEnableVertexAttribArray(vertex_normals_handle);
+            gl.glVertexAttribPointer(vertex_normals_handle, 3, GL3.GL_FLOAT, false, 0, 0);
             gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
-            ////////////////
+
+            //the texture positions buffer
+            if (group.material.texture != null) {
+                gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbo[2]); // Bind normals buffer
+                gl.glBufferData(GL3.GL_ARRAY_BUFFER, texture_buffer.length * Buffers.SIZEOF_FLOAT,
+                        Buffers.newDirectFloatBuffer(texture_buffer), GL3.GL_STATIC_DRAW);
+                gl.glEnableVertexAttribArray(vertex_textures_handle);
+                gl.glVertexAttribPointer(vertex_textures_handle, 2, GL3.GL_FLOAT, false, 0, 0);
+                gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
+            }
         }
 
         gl.glBindVertexArray(0); // Disable our Vertex Buffer Object 
