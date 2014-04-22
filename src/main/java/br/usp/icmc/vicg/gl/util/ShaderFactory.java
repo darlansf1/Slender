@@ -16,7 +16,8 @@ public class ShaderFactory {
     TRANSFORM_SHADER,
     MODEL_MATRIX_SHADER,
     MODEL_PROJECTION_MATRIX_SHADER,
-    VIEW_MODEL_PROJECTION_MATRIX_SHADER
+    VIEW_MODEL_PROJECTION_MATRIX_SHADER,
+    JWAVEFRONT_SHADER
   };
 
   public static Shader getInstance(ShaderType type) {
@@ -30,6 +31,8 @@ public class ShaderFactory {
       return new Shader("model_projection_vertex.glsl", "simple_fragment.glsl");
     } else if (type == ShaderType.VIEW_MODEL_PROJECTION_MATRIX_SHADER) {
       return new Shader("view_model_projection_vertex.glsl", "simple_fragment.glsl");
+    } else if (type == ShaderType.JWAVEFRONT_SHADER) {
+      return new Shader("jwavefront_vertex.glsl", "jwavefront_fragment.glsl");
     }
     return null;
   }
