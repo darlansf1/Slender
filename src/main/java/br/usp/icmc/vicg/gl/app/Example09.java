@@ -22,10 +22,12 @@ import br.usp.icmc.vicg.gl.util.ShaderFactory.ShaderType;
 
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
-public class Example09 implements GLEventListener {
+public class Example09 extends KeyAdapter implements GLEventListener {
 
     private final Shader shader; // Gerenciador dos shaders
     private final Matrix4 modelMatrix;
@@ -34,6 +36,10 @@ public class Example09 implements GLEventListener {
 
     private final JWavefrontObject model;
     private final Light light;
+
+    private float alpha;
+    private float beta;
+    private float delta;
 
     public Example09() throws IOException {
         // Carrega os shaders
@@ -44,6 +50,10 @@ public class Example09 implements GLEventListener {
 
         model = new JWavefrontObject(new File("./data/al.obj"));
         light = new Light();
+
+        alpha = 0;
+        beta = 0;
+        delta = 5;
     }
 
     @Override
@@ -71,21 +81,10 @@ public class Example09 implements GLEventListener {
         projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
         viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
-        // Inicializa o sistema de coordenadas
-        projectionMatrix.loadIdentity();
-        projectionMatrix.perspective(45.0f, 1.0f, 0.1f, 10.0f);
-        projectionMatrix.bind();
-
-        viewMatrix.loadIdentity();
-        viewMatrix.lookAt(4.0f, 1.0f, 2.0f,
-                0.0f, 0.0f, 0.0f,
-                0.0f, 1.0f, 0.0f);
-        viewMatrix.bind();
-
         //init the model
         model.init(gl, shader);
         model.unitize();
-        //model.dump();
+        model.dump();
 
         //init the light
         light.setPosition(new float[]{10, 10, 50, 1.0f});
@@ -93,7 +92,7 @@ public class Example09 implements GLEventListener {
         light.setDiffuseColor(new float[]{0.75f, 0.75f, 0.75f, 1.0f});
         light.setSpecularColor(new float[]{0.7f, 0.7f, 0.7f, 1.0f});
 
-        light.init(gl, shader.getUniformLocation("u_lightDirection"),
+        light.init(gl, shader.getUniformLocation("u_light.position"),
                 shader.getUniformLocation("u_light.ambientColor"),
                 shader.getUniformLocation("u_light.diffuseColor"),
                 shader.getUniformLocation("u_light.specularColor"));
@@ -107,8 +106,17 @@ public class Example09 implements GLEventListener {
         // Limpa o frame buffer com a cor definida
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
+        projectionMatrix.loadIdentity();
+        projectionMatrix.ortho(-delta, delta, -delta, delta, -2*delta, 2*delta);
+        projectionMatrix.bind();
+
         modelMatrix.loadIdentity();
+        modelMatrix.rotate(beta, 0, 1.0f, 0);
+        modelMatrix.rotate(alpha, 1.0f, 0, 0);
         modelMatrix.bind();
+
+        viewMatrix.loadIdentity();
+        viewMatrix.bind();
 
         light.bind();
 
@@ -127,6 +135,31 @@ public class Example09 implements GLEventListener {
         model.dispose();
     }
 
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_PAGE_UP://faz zoom-in
+                delta = delta * 0.809f;
+                break;
+            case KeyEvent.VK_PAGE_DOWN://faz zoom-out
+                delta = delta * 1.1f;
+                break;
+            case KeyEvent.VK_UP://gira sobre o eixo-x
+                alpha = alpha - 1;
+                break;
+            case KeyEvent.VK_DOWN://gira sobre o eixo-x
+                alpha = alpha + 1;
+                break;
+            case KeyEvent.VK_LEFT://gira sobre o eixo-y
+                beta = beta - 1;
+                break;
+            case KeyEvent.VK_RIGHT://gira sobre o eixo-y
+                beta = beta + 1;
+                break;
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         // Get GL3 profile (to work with OpenGL 4.0)
         GLProfile profile = GLProfile.get(GLProfile.GL3);
@@ -143,9 +176,10 @@ public class Example09 implements GLEventListener {
         Example09 listener = new Example09();
         glCanvas.addGLEventListener(listener);
 
-        Frame frame = new Frame("Example 05");
+        Frame frame = new Frame("Example 09");
         frame.setSize(600, 600);
         frame.add(glCanvas);
+        frame.addKeyListener(listener);
         final AnimatorBase animator = new FPSAnimator(glCanvas, 60);
 
         frame.addWindowListener(new WindowAdapter() {
