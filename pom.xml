@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>br.usp.icmc.vicg.gl</groupId>
-  <artifactId>cg2013</artifactId>
+  <artifactId>cg2014</artifactId>
   <name>CG2013</name>
   <packaging>jar</packaging>
   <version>1.0</version>
