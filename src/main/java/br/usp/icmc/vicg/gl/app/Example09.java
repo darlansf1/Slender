@@ -26,6 +26,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Example09 extends KeyAdapter implements GLEventListener {
 
@@ -41,14 +43,14 @@ public class Example09 extends KeyAdapter implements GLEventListener {
     private float beta;
     private float delta;
 
-    public Example09() throws IOException {
+    public Example09() {
         // Carrega os shaders
         shader = ShaderFactory.getInstance(ShaderType.JWAVEFRONT_SHADER);
         modelMatrix = new Matrix4();
         projectionMatrix = new Matrix4();
         viewMatrix = new Matrix4();
 
-        model = new JWavefrontObject(new File("./data/al.obj"));
+        model = new JWavefrontObject(new File("./data/murci/murcilego.obj"));
         light = new Light();
 
         alpha = 0;
@@ -80,15 +82,19 @@ public class Example09 extends KeyAdapter implements GLEventListener {
         modelMatrix.init(gl, shader.getUniformLocation("u_modelMatrix"));
         projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
         viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
-
-        //init the model
-        model.init(gl, shader);
-        model.unitize();
-        model.dump();
+        
+        try {
+            //init the model
+            model.init(gl, shader);
+            model.unitize();
+            model.dump();
+        } catch (IOException ex) {
+            Logger.getLogger(Example09.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //init the light
         light.setPosition(new float[]{10, 10, 50, 1.0f});
-        light.setAmbientColor(new float[]{0.3f, 0.3f, 0.3f, 1.0f});
+        light.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
         light.setDiffuseColor(new float[]{0.75f, 0.75f, 0.75f, 1.0f});
         light.setSpecularColor(new float[]{0.7f, 0.7f, 0.7f, 1.0f});
 
@@ -107,7 +113,7 @@ public class Example09 extends KeyAdapter implements GLEventListener {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
         projectionMatrix.loadIdentity();
-        projectionMatrix.ortho(-delta, delta, -delta, delta, -2*delta, 2*delta);
+        projectionMatrix.ortho(-delta, delta, -delta, delta, -2 * delta, 2 * delta);
         projectionMatrix.bind();
 
         modelMatrix.loadIdentity();
@@ -146,21 +152,21 @@ public class Example09 extends KeyAdapter implements GLEventListener {
                 delta = delta * 1.1f;
                 break;
             case KeyEvent.VK_UP://gira sobre o eixo-x
-                alpha = alpha - 1;
+                alpha = alpha - 5;
                 break;
             case KeyEvent.VK_DOWN://gira sobre o eixo-x
-                alpha = alpha + 1;
+                alpha = alpha + 5;
                 break;
             case KeyEvent.VK_LEFT://gira sobre o eixo-y
-                beta = beta - 1;
+                beta = beta - 5;
                 break;
             case KeyEvent.VK_RIGHT://gira sobre o eixo-y
-                beta = beta + 1;
+                beta = beta + 5;
                 break;
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // Get GL3 profile (to work with OpenGL 4.0)
         GLProfile profile = GLProfile.get(GLProfile.GL3);
 

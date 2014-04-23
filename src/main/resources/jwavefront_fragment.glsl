@@ -19,13 +19,17 @@ struct MaterialProperties
 uniform	LightProperties u_light;
 uniform	MaterialProperties u_material;
 
+uniform sampler2D u_texture;
+uniform bool u_is_texture;
+
 in vec3 v_normal;
 in vec3 v_eye;
+in vec2 v_texcoord;
 
 out vec4 fragColor;
 
 void main(void)
-{	 
+{
     vec4 color = u_light.ambientColor * u_material.ambientColor;
 
 	vec3 normal = normalize(v_normal);
@@ -36,17 +40,20 @@ void main(void)
 
 	if (nDotL > 0.0)
 	{
-		vec3 eye = normalize(v_eye);
+        if(u_is_texture) {
+            color += texture(u_texture, v_texcoord) * nDotL;
+        } else {
+            color += u_light.diffuseColor * u_material.diffuseColor * nDotL;
+        }
 
-		// Incident vector is opposite light direction vector.
-		vec3 reflection = reflect(-direction, normal);
+        vec3 eye = normalize(v_eye);
 
-		float eDotR = max(dot(eye, reflection), 0.0);
+        // Incident vector is opposite light direction vector.
+        vec3 reflection = reflect(-direction, normal);
 
-		color += u_light.diffuseColor * u_material.diffuseColor * nDotL;
+        float eDotR = max(dot(eye, reflection), 0.0);
 
 		float specularIntensity = 0.0;
-
 		if (eDotR > 0.0)
 		{
 			specularIntensity = pow(eDotR, u_material.specularExponent);

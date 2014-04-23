@@ -7,7 +7,10 @@ package br.usp.icmc.vicg.gl.jwavefront;
 
 import br.usp.icmc.vicg.gl.util.Shader;
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.texture.TextureIO;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL3;
 import javax.media.opengl.GLProfile;
@@ -33,7 +37,9 @@ public class JWavefrontObject {
     private int vertex_positions_handle;
     private int vertex_normals_handle;
     private int vertex_textures_handle;
-    
+    private int is_texture_handle;
+    private int texture_handle;
+
     private ArrayList<Group> groups;
     private ArrayList<Vertex> vertices;
     private ArrayList<Normal> normals;
@@ -50,7 +56,7 @@ public class JWavefrontObject {
      * @param shader
      * @throws IOException
      */
-    public JWavefrontObject(File file) throws IOException {
+    public JWavefrontObject(File file) {
         groups = new ArrayList<Group>();
         vertices = new ArrayList<Vertex>() {
             @Override
@@ -78,10 +84,9 @@ public class JWavefrontObject {
 
         pathname = file;
         current_group = null;
-        parse(file);
     }
 
-    public void init(GL3 gl, Shader shader) {
+    public void init(GL3 gl, Shader shader) throws IOException {
         this.gl = gl;
 
         this.material = new br.usp.icmc.vicg.gl.core.Material();
@@ -92,7 +97,13 @@ public class JWavefrontObject {
 
         this.vertex_positions_handle = shader.getAttribLocation("a_position");
         this.vertex_normals_handle = shader.getAttribLocation("a_normal");
-        this.vertex_textures_handle = shader.getAttribLocation("a_texture");
+        this.vertex_textures_handle = shader.getAttribLocation("a_texcoord");
+
+        //control if it is a texture or material
+        this.is_texture_handle = shader.getUniformLocation("u_is_texture");
+        this.texture_handle = shader.getUniformLocation("u_texture");
+
+        parse(pathname);
     }
 
     /**
@@ -663,12 +674,16 @@ public class JWavefrontObject {
                                         file = new File(pathname.getParent() + "/" + name);
 
                                         if (file.exists()) {
-                                            //BufferedImage image = ImageIO.read(file);
-                                            //ImageUtil.flipImageVertically(image); //vertically flip the image
+                                            BufferedImage image = ImageIO.read(file);
+                                            ImageUtil.flipImageVertically(image); //vertically flip the image
 
                                             texture = new Texture(name);
-                                            texture.texturedata = TextureIO.newTextureData(GLProfile.get(GLProfile.GL3),
-                                                    file, false, null);
+                                            texture.texturedata = AWTTextureIO.newTexture(GLProfile.get(GLProfile.GL3), image, true);
+                                            texture.texturedata.bind(gl);
+                                            gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
+                                            gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR_MIPMAP_NEAREST);
+                                            gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT);
+                                            gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT);
                                             textures.add(texture);
                                         } else {
                                             Logger.getLogger(JWavefrontObject.class.getName()).log(Level.WARNING,
@@ -724,6 +739,15 @@ public class JWavefrontObject {
                 Group group = groups.get(i);
                 if (group.triangles.isEmpty()) {
                     continue;
+                }
+                
+                if (group.material.texture != null) {
+                    gl.glUniform1i(is_texture_handle, 1);
+                    gl.glUniform1i(texture_handle, 0);
+                    gl.glActiveTexture(GL3.GL_TEXTURE0);
+                    group.material.texture.texturedata.bind(gl);
+                } else {
+                    gl.glUniform1i(is_texture_handle, 0);
                 }
 
                 if (group.material != null) {
