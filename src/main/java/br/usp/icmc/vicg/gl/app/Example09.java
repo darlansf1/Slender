@@ -50,7 +50,7 @@ public class Example09 extends KeyAdapter implements GLEventListener {
         projectionMatrix = new Matrix4();
         viewMatrix = new Matrix4();
 
-        model = new JWavefrontObject(new File("./data/murci/murcilego.obj"));
+        model = new JWavefrontObject(new File("./data/robot/robot.obj"));
         light = new Light();
 
         alpha = 0;
