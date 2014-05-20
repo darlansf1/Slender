@@ -7,7 +7,6 @@ package br.usp.icmc.vicg.gl.jwavefront;
 import br.usp.icmc.vicg.gl.util.Shader;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.awt.ImageUtil;
-import com.jogamp.opengl.util.texture.TextureIO;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -85,10 +84,7 @@ public class JWavefrontObject {
     this.gl = gl;
 
     this.material = new br.usp.icmc.vicg.gl.core.Material();
-    this.material.init(gl, shader.getUniformLocation("u_material.ambientColor"),
-            shader.getUniformLocation("u_material.diffuseColor"),
-            shader.getUniformLocation("u_material.specularColor"),
-            shader.getUniformLocation("u_material.specularExponent"));
+    this.material.init(gl, shader);
 
     this.vertex_positions_handle = shader.getAttribLocation("a_position");
     this.vertex_normals_handle = shader.getAttribLocation("a_normal");

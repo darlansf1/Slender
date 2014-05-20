@@ -12,10 +12,10 @@ import javax.media.opengl.GL3;
  *
  * @author PC
  */
-public class WiredCube extends Model {
+public class WiredCube extends SimpleModel {
 
     public WiredCube() {
-        vertices = new float[]{
+        vertex_buffer = new float[]{
             // Front face
            -0.5f, -0.5f, 0.5f, 
             0.5f, -0.5f, 0.5f, 

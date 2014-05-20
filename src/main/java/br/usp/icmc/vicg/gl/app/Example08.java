@@ -2,7 +2,7 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
-import br.usp.icmc.vicg.gl.model.Model;
+import br.usp.icmc.vicg.gl.model.SimpleModel;
 import br.usp.icmc.vicg.gl.model.WiredCube;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -29,7 +29,7 @@ public class Example08 implements GLEventListener {
     private final Matrix4 modelMatrix;
     private final Matrix4 projectionMatrix;
     private final Matrix4 viewMatrix;
-    private final Model cube;
+    private final SimpleModel cube;
 
     public Example08() {
         // Carrega os shaders
@@ -73,7 +73,7 @@ public class Example08 implements GLEventListener {
         viewMatrix.bind();
 
         //cria o objeto a ser desenhado
-        cube.init(gl, shader.getAttribLocation("a_position"));
+        cube.init(gl, shader);
     }
 
     @Override

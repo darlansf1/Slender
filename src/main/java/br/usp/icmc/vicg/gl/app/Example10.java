@@ -1,8 +1,10 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.core.Light;
-import br.usp.icmc.vicg.gl.jwavefront.JWavefrontObject;
+import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
+import br.usp.icmc.vicg.gl.model.Cube;
+import br.usp.icmc.vicg.gl.model.SimpleModel;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -21,38 +23,26 @@ import br.usp.icmc.vicg.gl.util.ShaderFactory.ShaderType;
 
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class Example09 extends KeyAdapter implements GLEventListener {
+public class Example10 implements GLEventListener {
 
   private final Shader shader; // Gerenciador dos shaders
   private final Matrix4 modelMatrix;
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
-  private final JWavefrontObject model;
+  private final SimpleModel cube;
   private final Light light;
-  private float alpha;
-  private float beta;
-  private float delta;
+  private final Material material;
 
-  public Example09() {
+  public Example10() {
     // Carrega os shaders
     shader = ShaderFactory.getInstance(ShaderType.COMPLETE_SHADER);
     modelMatrix = new Matrix4();
     projectionMatrix = new Matrix4();
     viewMatrix = new Matrix4();
-
-    model = new JWavefrontObject(new File("./data/robot/robot.obj"));
+    cube = new Cube();
     light = new Light();
-
-    alpha = 0;
-    beta = 0;
-    delta = 5;
+    material = new Material();
   }
 
   @Override
@@ -63,7 +53,7 @@ public class Example09 extends KeyAdapter implements GLEventListener {
     // Print OpenGL version
     System.out.println("OpenGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n");
 
-    gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    gl.glClearColor(0, 0, 0, 0);
     gl.glClearDepth(1.0f);
 
     gl.glEnable(GL.GL_DEPTH_TEST);
@@ -80,21 +70,37 @@ public class Example09 extends KeyAdapter implements GLEventListener {
     projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
-    try {
-      //init the model
-      model.init(gl, shader);
-      model.unitize();
-      model.dump();
-    } catch (IOException ex) {
-      Logger.getLogger(Example09.class.getName()).log(Level.SEVERE, null, ex);
-    }
+    // Inicializa o sistema de coordenadas
+    projectionMatrix.loadIdentity();
+    projectionMatrix.ortho(
+            -2, 2,
+            -2, 2,
+            -10, 10);
+    projectionMatrix.bind();
 
-    //init the light
-    light.setPosition(new float[]{10, 10, 50, 1.0f});
-    light.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
-    light.setDiffuseColor(new float[]{0.75f, 0.75f, 0.75f, 1.0f});
-    light.setSpecularColor(new float[]{0.7f, 0.7f, 0.7f, 1.0f});
+    viewMatrix.loadIdentity();
+    viewMatrix.lookAt(
+            1, 1, 1,
+            0, 0, 0,
+            0, 1, 0);
+    viewMatrix.bind();
+
     light.init(gl, shader);
+    light.setPosition(new float[]{0.0f, 1.0f, 2.0f, 0.0f});
+    light.setAmbientColor(new float[]{0.9f, 0.9f, 0.9f, 0.0f});
+    light.setDiffuseColor(new float[]{1.0f, 1.0f, 1.0f, 0.0f});
+    light.setSpecularColor(new float[]{0.9f, 0.9f, 0.9f, 0.0f});
+    light.bind();
+
+    material.init(gl, shader);
+    material.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 0.0f});
+    material.setDiffuseColor(new float[]{0.0f, 1.0f, 1.0f, 0.0f});
+    material.setSpecularColor(new float[]{0.9f, 0.9f, 0.9f, 0.0f});
+    material.setSpecularExponent(32);
+    material.bind();
+
+    //cria o objeto a ser desenhado
+    cube.init(gl, shader);
   }
 
   @Override
@@ -105,28 +111,11 @@ public class Example09 extends KeyAdapter implements GLEventListener {
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
-    projectionMatrix.loadIdentity();
-    projectionMatrix.ortho(
-            -delta, delta, 
-            -delta, delta, 
-            -2 * delta, 2 * delta);
-    projectionMatrix.bind();
-
     modelMatrix.loadIdentity();
-    modelMatrix.rotate(beta, 0, 1.0f, 0);
-    modelMatrix.rotate(alpha, 1.0f, 0, 0);
     modelMatrix.bind();
 
-    viewMatrix.loadIdentity();
-    viewMatrix.lookAt(
-            1, 1, 1, 
-            0, 0, 0, 
-            0, 1, 0);
-    viewMatrix.bind();
-
-    light.bind();
-
-    model.draw();
+    cube.bind();
+    cube.draw();
 
     // Força execução das operações declaradas
     gl.glFlush();
@@ -138,32 +127,8 @@ public class Example09 extends KeyAdapter implements GLEventListener {
 
   @Override
   public void dispose(GLAutoDrawable drawable) {
-    model.dispose();
-  }
-
-  @Override
-  public void keyPressed(KeyEvent e) {
-
-    switch (e.getKeyCode()) {
-      case KeyEvent.VK_PAGE_UP://faz zoom-in
-        delta = delta * 0.809f;
-        break;
-      case KeyEvent.VK_PAGE_DOWN://faz zoom-out
-        delta = delta * 1.1f;
-        break;
-      case KeyEvent.VK_UP://gira sobre o eixo-x
-        alpha = alpha - 5;
-        break;
-      case KeyEvent.VK_DOWN://gira sobre o eixo-x
-        alpha = alpha + 5;
-        break;
-      case KeyEvent.VK_LEFT://gira sobre o eixo-y
-        beta = beta - 5;
-        break;
-      case KeyEvent.VK_RIGHT://gira sobre o eixo-y
-        beta = beta + 5;
-        break;
-    }
+    // Apaga o buffer
+    cube.dispose();
   }
 
   public static void main(String[] args) {
@@ -179,13 +144,12 @@ public class Example09 extends KeyAdapter implements GLEventListener {
     GLCanvas glCanvas = new GLCanvas(glcaps);
 
     // Add listener to panel
-    Example09 listener = new Example09();
+    Example10 listener = new Example10();
     glCanvas.addGLEventListener(listener);
 
-    Frame frame = new Frame("Example 09");
+    Frame frame = new Frame("Example 05");
     frame.setSize(600, 600);
     frame.add(glCanvas);
-    frame.addKeyListener(listener);
     final AnimatorBase animator = new FPSAnimator(glCanvas, 60);
 
     frame.addWindowListener(new WindowAdapter() {

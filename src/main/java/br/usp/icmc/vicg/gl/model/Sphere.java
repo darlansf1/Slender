@@ -12,7 +12,7 @@ import javax.media.opengl.GL;
  *
  * @author PC
  */
-public class Sphere extends Model {
+public class Sphere extends SimpleModel {
 
     private final int lats;
     private final int longs;
@@ -23,7 +23,7 @@ public class Sphere extends Model {
         this.lats = 40;
         this.longs = 40;
 
-        vertices = new float[(lats + 1) * (longs + 1) * 6];
+        vertex_buffer = new float[(lats + 1) * (longs + 1) * 6];
 
         int i, j, k;
         for (i = 0, k = -1; i <= lats; i++) {
@@ -40,13 +40,13 @@ public class Sphere extends Model {
                 float x = (float) Math.cos(lng);
                 float y = (float) Math.sin(lng);
                 
-                vertices[++k] = x * zr0 * radius;
-                vertices[++k] = y * zr0 * radius;
-                vertices[++k] = z0 * radius;
+                vertex_buffer[++k] = x * zr0 * radius;
+                vertex_buffer[++k] = y * zr0 * radius;
+                vertex_buffer[++k] = z0 * radius;
                 
-                vertices[++k] = x * zr1 * radius;
-                vertices[++k] = y * zr1 * radius;
-                vertices[++k] = z1 * radius;
+                vertex_buffer[++k] = x * zr1 * radius;
+                vertex_buffer[++k] = y * zr1 * radius;
+                vertex_buffer[++k] = z1 * radius;
             }
         }
     }

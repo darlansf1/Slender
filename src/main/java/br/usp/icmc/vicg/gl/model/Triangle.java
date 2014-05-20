@@ -12,11 +12,11 @@ import javax.media.opengl.GL;
  *
  * @author PC
  */
-public class Triangle extends Model {
+public class Triangle extends SimpleModel {
 
     public Triangle() {
         // Triangle
-        vertices = new float[]{
+        vertex_buffer = new float[]{
             -0.5f, -0.5f, 0.0f,
             0.5f, -0.5f, 0.0f,
             0.0f, 0.5f, 0.0f,};

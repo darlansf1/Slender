@@ -18,6 +18,8 @@ struct MaterialProperties
 
 uniform	LightProperties u_light;
 uniform	MaterialProperties u_material;
+uniform mat4 u_viewMatrix;
+uniform mat4 u_modelMatrix;
 
 uniform sampler2D u_texture;
 uniform bool u_is_texture;
@@ -25,6 +27,7 @@ uniform bool u_is_texture;
 in vec3 v_normal;
 in vec3 v_eye;
 in vec2 v_texcoord;
+in vec4 v_position;
 
 out vec4 fragColor;
 
@@ -34,7 +37,7 @@ void main(void)
 
 	vec3 normal = normalize(v_normal);
 
-    vec3 direction = normalize(vec3(u_light.position));
+    vec3 direction = normalize(vec3((u_viewMatrix * u_modelMatrix * u_light.position) - v_position));
 
 	float nDotL = max(dot(direction, normal), 0.0);
 

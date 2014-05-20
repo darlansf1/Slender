@@ -1,7 +1,7 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
-import br.usp.icmc.vicg.gl.model.Model;
+import br.usp.icmc.vicg.gl.model.SimpleModel;
 import br.usp.icmc.vicg.gl.model.Triangle;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -27,7 +27,7 @@ public class Example05 implements GLEventListener {
   private final Shader shader; // Gerenciador dos shaders
   private final Matrix4 modelMatrix;
   private final Matrix4 projectionMatrix;
-  private final Model triangle;
+  private final SimpleModel triangle;
 
   public Example05() {
     // Carrega os shaders
@@ -58,7 +58,7 @@ public class Example05 implements GLEventListener {
     projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
 
     //cria o objeto a ser desenhado
-    triangle.init(gl, shader.getAttribLocation("a_position"));
+    triangle.init(gl, shader);
   }
 
   @Override
@@ -92,10 +92,12 @@ public class Example05 implements GLEventListener {
 
     // Estabelece a janela de recorte
     if (width <= height) {
-      projectionMatrix.ortho2D(-1.0f, 1.0f, 
+      projectionMatrix.ortho2D(
+              -1.0f, 1.0f, 
               (-1.0f * height) / width, (1.0f * height) / width);
     } else {
-      projectionMatrix.ortho2D((-1.0f * width) / height, (1.0f * width) / height, 
+      projectionMatrix.ortho2D(
+              (-1.0f * width) / height, (1.0f * width) / height, 
               -1.0f, 1.0f);
     }
     
