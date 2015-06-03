@@ -4,7 +4,7 @@ import br.usp.icmc.vicg.gl.core.Light;
 import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
 import br.usp.icmc.vicg.gl.model.SimpleModel;
-import br.usp.icmc.vicg.gl.model.SolidSphere;
+import br.usp.icmc.vicg.gl.model.Triangle;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -24,23 +24,23 @@ import br.usp.icmc.vicg.gl.util.ShaderFactory.ShaderType;
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
 
-public class Example09 implements GLEventListener {
+public class Example13 implements GLEventListener {
 
   private final Shader shader; // Gerenciador dos shaders
   private final Matrix4 modelMatrix;
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
-  private final SimpleModel sphere;
+  private final SimpleModel triangle;
   private final Light light;
   private final Material material;
 
-  public Example09() {
+  public Example13() {
     // Carrega os shaders
     shader = ShaderFactory.getInstance(ShaderType.LIGHT_SHADER);
     modelMatrix = new Matrix4();
     projectionMatrix = new Matrix4();
     viewMatrix = new Matrix4();
-    sphere = new SolidSphere();
+    triangle = new Triangle();
 
     light = new Light();
     material = new Material();
@@ -60,6 +60,11 @@ public class Example09 implements GLEventListener {
     gl.glEnable(GL.GL_DEPTH_TEST); //ativa z-buffer
     gl.glEnable(GL.GL_CULL_FACE); //ativa culling
 
+    //ativa antialiasing para linha
+    gl.glEnable(GL.GL_LINE_SMOOTH);
+    gl.glEnable(GL.GL_BLEND);
+    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+   
     //inicializa os shaders
     shader.init(gl);
 
@@ -71,42 +76,31 @@ public class Example09 implements GLEventListener {
     projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
-    // Inicializa o sistema de coordenadas
     projectionMatrix.loadIdentity();
-    projectionMatrix.ortho(-2.0f, 2.0f, 
-            -2.0f, 2.0f, 
-            -2.0f, 2.0f);
     projectionMatrix.bind();
-    projectionMatrix.print();
-
-    viewMatrix.loadIdentity();
-    viewMatrix.lookAt(0.0f, 0.0f, 2.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f);
-    viewMatrix.bind();
 
     modelMatrix.loadIdentity();
     modelMatrix.bind();
 
+    viewMatrix.loadIdentity();
+    viewMatrix.bind();
+    
     //cria o objeto a ser desenhado
-    sphere.init(gl, shader);
+    triangle.init(gl, shader);
 
     //inicializa a luz
-    light.setPosition(new float[]{2.0f, 2.0f, 2.0f, 1.0f});
+    light.setPosition(new float[]{0.0f, 0.0f, 1.0f, 1.0f});
     light.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
     light.setDiffuseColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
     light.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
-//    light.setConstantAttenuation(1.0f);
-//    light.setLinearAttenuation(0.15f);
-//    light.setQuadraticAttenuation(0.1f);
     light.init(gl, shader);
     light.bind();
 
     //deine material
     material.init(gl, shader);
-    material.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
-    material.setDiffuseColor(new float[]{1.0f, 1.0f, 0.0f, 1.0f});
-    material.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
+    material.setAmbientColor(new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+    material.setDiffuseColor(new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+    material.setSpecularColor(new float[]{1.0f, 0.0f, 1.0f, 1.0f});
     material.setSpecularExponent(64.0f);
     material.bind();
   }
@@ -116,11 +110,11 @@ public class Example09 implements GLEventListener {
     // Recupera o pipeline
     GL3 gl = drawable.getGL().getGL3();
 
-    // Limpa o frame e o depth buffer
+    // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
-    sphere.bind();
-    sphere.draw();
+    triangle.bind();
+    triangle.draw();
 
     // Força execução das operações declaradas
     gl.glFlush();
@@ -133,7 +127,7 @@ public class Example09 implements GLEventListener {
   @Override
   public void dispose(GLAutoDrawable drawable) {
     // Apaga o buffer
-    sphere.dispose();
+    triangle.dispose();
   }
 
   public static void main(String[] args) {
@@ -149,10 +143,10 @@ public class Example09 implements GLEventListener {
     GLCanvas glCanvas = new GLCanvas(glcaps);
 
     // Add listener to panel
-    Example09 listener = new Example09();
+    Example13 listener = new Example13();
     glCanvas.addGLEventListener(listener);
 
-    Frame frame = new Frame("Example 09a");
+    Frame frame = new Frame("Example 13");
     frame.setSize(600, 600);
     frame.add(glCanvas);
     final AnimatorBase animator = new FPSAnimator(glCanvas, 60);
@@ -166,13 +160,10 @@ public class Example09 implements GLEventListener {
             animator.stop();
             System.exit(0);
           }
-
         }).start();
       }
-
     });
     frame.setVisible(true);
     animator.start();
   }
-
 }

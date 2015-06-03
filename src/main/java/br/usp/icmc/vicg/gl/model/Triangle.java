@@ -20,6 +20,11 @@ public class Triangle extends SimpleModel {
             -0.5f, -0.5f, 0.0f,
             0.5f, -0.5f, 0.0f,
             0.0f, 0.5f, 0.0f,};
+        
+        normal_buffer = new  float[]{
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f};
     }
     
     @Override

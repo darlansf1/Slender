@@ -17,6 +17,9 @@ public class ShaderFactory {
     MODEL_MATRIX_SHADER,
     MODEL_PROJECTION_MATRIX_SHADER,
     VIEW_MODEL_PROJECTION_MATRIX_SHADER,
+    LIGHT_SHADER,
+    TEXTURE_SHADER,
+    NORMALMAP_SHADER,
     COMPLETE_SHADER
   };
 
@@ -31,6 +34,12 @@ public class ShaderFactory {
       return new Shader("model_projection_vertex.glsl", "simple_fragment.glsl");
     } else if (type == ShaderType.VIEW_MODEL_PROJECTION_MATRIX_SHADER) {
       return new Shader("view_model_projection_vertex.glsl", "simple_fragment.glsl");
+    } else if (type == ShaderType.LIGHT_SHADER) {
+      return new Shader("light_vertex.glsl", "light_fragment.glsl");
+    } else if (type == ShaderType.TEXTURE_SHADER) {
+      return new Shader("texture_vertex.glsl", "texture_fragment.glsl");
+    }  else if (type == ShaderType.NORMALMAP_SHADER) {
+      return new Shader("normalmap_vertex.glsl", "normalmap_fragment.glsl");
     } else if (type == ShaderType.COMPLETE_SHADER) {
       return new Shader("complete_vertex.glsl", "complete_fragment.glsl");
     }

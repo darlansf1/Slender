@@ -48,7 +48,7 @@ public class Example07 implements GLEventListener {
         // Print OpenGL version
         System.out.println("OpenGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n");
 
-        gl.glClearColor(0, 0, 0, 0);
+        gl.glClearColor(1, 1, 1, 1);
 
         //inicializa os shaders
         shader.init(gl);
@@ -64,13 +64,13 @@ public class Example07 implements GLEventListener {
         // Inicializa o sistema de coordenadas
         projectionMatrix.loadIdentity();
         projectionMatrix.ortho(
-                -2.5f, 2.5f, 
-                -2.5f, 2.5f, 
-                -2.5f, 2.5f);
+                -6.5f, 6.5f, 
+                -6.5f, 6.5f, 
+                -6.5f, 6.5f);
         projectionMatrix.bind();
         
         viewMatrix.loadIdentity();
-        viewMatrix.lookAt(1.0f, 0.5f, 0.5f, 
+        viewMatrix.lookAt(2.0f, 0.5f, 1.0f, 
                         0.0f, 0.0f, 0.0f, 
                         0.0f, 1.0f, 0.0f);
         viewMatrix.bind();

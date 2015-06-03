@@ -8,10 +8,12 @@ import java.util.Arrays;
 public class Material {
 
   private GL3 gl;
+
   private float[] ambientColor;
   private float[] diffuseColor;
   private float[] specularColor;
   private float specularExponent;
+  
   private int ambientColorHandle;
   private int diffuseColorHandle;
   private int specularColorHandle;
@@ -21,7 +23,7 @@ public class Material {
     setAmbientColor(new float[]{0.2f, 0.2f, 0.2f, 1.0f});
     setDiffuseColor(new float[]{0.8f, 0.8f, 0.8f, 1.0f});
     setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
-    setSpecularExponent(0);
+    setSpecularExponent(1);
   }
 
   public final void setAmbientColor(float[] ambientColor) {

@@ -46,7 +46,7 @@ public class Example06 implements GLEventListener {
         // Print OpenGL version
         System.out.println("OpenGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n");
 
-        gl.glClearColor(0, 0, 0, 0);
+        gl.glClearColor(1, 1, 1, 0);
 
         //inicializa os shaders
         shader.init(gl);
@@ -79,7 +79,9 @@ public class Example06 implements GLEventListener {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
         modelMatrix.loadIdentity();
-        modelMatrix.scale(0.5f, 0.5f, 1.0f);
+//        modelMatrix.scale(0.5f, 0.5f, 0.5f);
+        modelMatrix.rotate(45, 0, 1, 0);
+        modelMatrix.rotate(45, 1, 0, 0);
         modelMatrix.bind();
 
         cube.bind();

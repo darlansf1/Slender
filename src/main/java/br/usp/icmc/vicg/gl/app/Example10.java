@@ -93,8 +93,8 @@ public class Example10 implements GLEventListener {
     light.bind();
 
     material.init(gl, shader);
-    material.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 0.0f});
-    material.setDiffuseColor(new float[]{0.0f, 1.0f, 1.0f, 0.0f});
+    material.setAmbientColor(new float[]{0.5f, 0.5f, 0.5f, 0.0f});
+    material.setDiffuseColor(new float[]{1.0f, 0.0f, 0.0f, 0.0f});
     material.setSpecularColor(new float[]{0.9f, 0.9f, 0.9f, 0.0f});
     material.setSpecularExponent(32);
     material.bind();

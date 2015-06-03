@@ -1,14 +1,12 @@
-package br.usp.icmc.vicg.gl.app;
+package br.usp.icmc.vicg.gl.util;
 
-import br.usp.icmc.vicg.gl.core.Light;
-import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
 import br.usp.icmc.vicg.gl.model.SimpleModel;
-import br.usp.icmc.vicg.gl.model.SolidSphere;
+import com.jogamp.opengl.util.AnimatorBase;
+import com.jogamp.opengl.util.FPSAnimator;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.media.opengl.GL;
 import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
@@ -17,33 +15,28 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 
-import br.usp.icmc.vicg.gl.util.Shader;
-import br.usp.icmc.vicg.gl.util.ShaderFactory;
-import br.usp.icmc.vicg.gl.util.ShaderFactory.ShaderType;
-
-import com.jogamp.opengl.util.AnimatorBase;
-import com.jogamp.opengl.util.FPSAnimator;
-
-public class Example09 implements GLEventListener {
+/**
+ * ExercicioViewing3D.java <BR>
+ * author: Brian Paul (converted to Java by Ron Cemer and Sven Goethel)
+ * <P>
+ *
+ * This version is equal to Brian Paul's version 1.2 1999/10/21
+ */
+public class ExercicioViewing3D implements GLEventListener {
 
   private final Shader shader; // Gerenciador dos shaders
   private final Matrix4 modelMatrix;
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
-  private final SimpleModel sphere;
-  private final Light light;
-  private final Material material;
+  private final SimpleModel rectangle;
 
-  public Example09() {
+  public ExercicioViewing3D() {
     // Carrega os shaders
-    shader = ShaderFactory.getInstance(ShaderType.LIGHT_SHADER);
+    shader = ShaderFactory.getInstance(ShaderFactory.ShaderType.VIEW_MODEL_PROJECTION_MATRIX_SHADER);
     modelMatrix = new Matrix4();
     projectionMatrix = new Matrix4();
     viewMatrix = new Matrix4();
-    sphere = new SolidSphere();
-
-    light = new Light();
-    material = new Material();
+    rectangle = new MyForm();
   }
 
   @Override
@@ -51,14 +44,7 @@ public class Example09 implements GLEventListener {
     // Get pipeline
     GL3 gl = drawable.getGL().getGL3();
 
-    // Print OpenGL version
-    System.out.println("OpenGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n");
-
-    gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    gl.glClearDepth(1.0f);
-
-    gl.glEnable(GL.GL_DEPTH_TEST); //ativa z-buffer
-    gl.glEnable(GL.GL_CULL_FACE); //ativa culling
+    gl.glClearColor(0, 0, 0, 0);
 
     //inicializa os shaders
     shader.init(gl);
@@ -71,59 +57,49 @@ public class Example09 implements GLEventListener {
     projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
+//    // Inicializa o sistema de coordenadas
+//    projectionMatrix.loadIdentity();
+//    projectionMatrix.perspective(45, 5, 0.1f, 10);
+//    projectionMatrix.bind();
+//    
+//    System.out.println("Mpers =");
+//    projectionMatrix.print();
+//    System.out.println("");
     // Inicializa o sistema de coordenadas
     projectionMatrix.loadIdentity();
-    projectionMatrix.ortho(-2.0f, 2.0f, 
-            -2.0f, 2.0f, 
-            -2.0f, 2.0f);
+    projectionMatrix.ortho(
+            -2.0f, 2.0f,
+            -1.0f, 2.0f,
+            -4.0f, 4.0f);
     projectionMatrix.bind();
+
+    System.out.println("Mortho =");
     projectionMatrix.print();
+    System.out.println("");
 
     viewMatrix.loadIdentity();
-    viewMatrix.lookAt(0.0f, 0.0f, 2.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f);
+    viewMatrix.lookAt(2, 1, 0,
+            0, 0, 0,
+            0, 1, -1);
     viewMatrix.bind();
 
+    System.out.println("Mwc,vc =");
+    viewMatrix.print();
+    System.out.println("");
+
     modelMatrix.loadIdentity();
+    modelMatrix.rotate(45, 1, 2, 1);
+    modelMatrix.scale(2, 2, 2);
     modelMatrix.bind();
 
+    System.out.println("Model =");
+    modelMatrix.print();
+    System.out.println("");
+
+    gl.glViewport(0, 0, 500, 500);
+
     //cria o objeto a ser desenhado
-    sphere.init(gl, shader);
-
-    //inicializa a luz
-    light.setPosition(new float[]{2.0f, 2.0f, 2.0f, 1.0f});
-    light.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
-    light.setDiffuseColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
-    light.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
-//    light.setConstantAttenuation(1.0f);
-//    light.setLinearAttenuation(0.15f);
-//    light.setQuadraticAttenuation(0.1f);
-    light.init(gl, shader);
-    light.bind();
-
-    //deine material
-    material.init(gl, shader);
-    material.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
-    material.setDiffuseColor(new float[]{1.0f, 1.0f, 0.0f, 1.0f});
-    material.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
-    material.setSpecularExponent(64.0f);
-    material.bind();
-  }
-
-  @Override
-  public void display(GLAutoDrawable drawable) {
-    // Recupera o pipeline
-    GL3 gl = drawable.getGL().getGL3();
-
-    // Limpa o frame e o depth buffer
-    gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
-
-    sphere.bind();
-    sphere.draw();
-
-    // Força execução das operações declaradas
-    gl.glFlush();
+    rectangle.init(gl, shader);
   }
 
   @Override
@@ -131,9 +107,39 @@ public class Example09 implements GLEventListener {
   }
 
   @Override
-  public void dispose(GLAutoDrawable drawable) {
-    // Apaga o buffer
-    sphere.dispose();
+  public void display(GLAutoDrawable drawable) {
+    // Recupera o pipeline
+    GL3 gl = drawable.getGL().getGL3();
+
+    // Limpa o frame buffer com a cor definida
+    gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
+
+    rectangle.bind();
+    rectangle.draw();
+
+    // Força execução das operações declaradas
+    gl.glFlush();
+  }
+
+  @Override
+  public void dispose(GLAutoDrawable glad) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  class MyForm extends SimpleModel {
+
+    public MyForm() {
+      vertex_buffer = new float[]{
+        2, 0, 0,
+        0, 1, 0,
+        0, 0, 1};
+    }
+
+    @Override
+    public void draw() {
+      draw(GL.GL_LINE_LOOP);
+    }
+
   }
 
   public static void main(String[] args) {
@@ -149,10 +155,10 @@ public class Example09 implements GLEventListener {
     GLCanvas glCanvas = new GLCanvas(glcaps);
 
     // Add listener to panel
-    Example09 listener = new Example09();
+    ExercicioViewing3D listener = new ExercicioViewing3D();
     glCanvas.addGLEventListener(listener);
 
-    Frame frame = new Frame("Example 09a");
+    Frame frame = new Frame("ExercicioViewing3D");
     frame.setSize(600, 600);
     frame.add(glCanvas);
     final AnimatorBase animator = new FPSAnimator(glCanvas, 60);
@@ -174,5 +180,4 @@ public class Example09 implements GLEventListener {
     frame.setVisible(true);
     animator.start();
   }
-
 }

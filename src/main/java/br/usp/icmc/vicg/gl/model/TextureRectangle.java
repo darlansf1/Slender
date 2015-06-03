@@ -10,9 +10,9 @@ import javax.media.opengl.GL;
  *
  * @author paulovich
  */
-public class Rectangle extends SimpleModel {
+public class TextureRectangle extends TextureSimpleModel {
 
-  public Rectangle() {
+  public TextureRectangle() {
     vertex_buffer = new float[]{
       -0.5f, -0.5f, 0.0f,
       0.5f, -0.5f, 0.0f,
@@ -30,6 +30,16 @@ public class Rectangle extends SimpleModel {
       0, 0, 1,
       0, 0, 1,
       0, 0, 1
+    };
+
+    texture_buffer = new float[]{
+      0, 0,
+      1, 0,
+      1, 1,
+      
+      1, 1,
+      0, 1,
+      0, 0
     };
   }
 
