@@ -101,7 +101,7 @@ public class Example14 implements GLEventListener {
     //cria o objeto a ser desenhado
     rectangle.init(gl, shader);
     try {
-      rectangle.loadTexture("/Users/paulovich/Dropbox/USP/CG/codigo/java_novo/NormalMapping/src/normalmapping/image/face.jpg");
+      rectangle.loadTexture("images/face.jpg");
     } catch (IOException ex) {
       Logger.getLogger(Example14.class.getName()).log(Level.SEVERE, null, ex);
     }

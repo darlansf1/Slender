@@ -113,8 +113,8 @@ public class Example15 extends KeyAdapter implements GLEventListener {
     //cria o objeto a ser desenhado
     rectangle.init(gl, shader);
     try {
-      rectangle.loadTexture("/Users/paulovich/Dropbox/USP/CG/codigo/java_novo/NormalMapping/src/normalmapping/image/face.jpg");
-      rectangle.loadNormalMap("/Users/paulovich/Dropbox/USP/CG/codigo/java_novo/NormalMapping/src/normalmapping/image/nlinsample.jpg");
+      rectangle.loadTexture("images/wand_boden.jpg");
+      rectangle.loadNormalMap("images/wand_boden_normal.jpg");
     } catch (IOException ex) {
       Logger.getLogger(Example15.class.getName()).log(Level.SEVERE, null, ex);
     }

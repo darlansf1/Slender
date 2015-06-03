@@ -69,7 +69,7 @@ public class NormalMappingRectangle extends TextureSimpleModel {
   }
 
   public void loadNormalMap(String filename) throws IOException {
-    BufferedImage image = ImageIO.read(new File(filename));
+    BufferedImage image = ImageIO.read(getClass().getClassLoader().getResourceAsStream(filename));
     ImageUtil.flipImageVertically(image); //vertically flip the image
 
     normalmapdata = AWTTextureIO.newTexture(GLProfile.get(GLProfile.GL3), image, true);
