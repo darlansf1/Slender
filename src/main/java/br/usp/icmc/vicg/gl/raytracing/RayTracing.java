@@ -17,14 +17,14 @@ import br.usp.icmc.vicg.gl.util.Shader;
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
 
-public class RayCasting implements GLEventListener {
+public class RayTracing implements GLEventListener {
 
   private final Shader shader;
   private final SimpleModel rectangle;
 
-  public RayCasting() {
+  public RayTracing() {
     // Carrega os shaders
-    shader = new Shader("raycasting_vertex.glsl", "raycasting_fragment.glsl");
+    shader = new Shader("raytracing_vertex.glsl", "raytracing_fragment.glsl");
     rectangle = new MyForm();
   }
 
@@ -105,11 +105,11 @@ public class RayCasting implements GLEventListener {
     GLCanvas glCanvas = new GLCanvas(glcaps);
 
     // Add listener to panel
-    RayCasting listener = new RayCasting();
+    RayTracing listener = new RayTracing();
     glCanvas.addGLEventListener(listener);
 
     Frame frame = new Frame("Raytracing");
-    frame.setSize(600, 600);
+    frame.setSize(1000,1000);
     frame.add(glCanvas);
     final AnimatorBase animator = new FPSAnimator(glCanvas, 1, true);
 
