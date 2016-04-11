@@ -53,6 +53,6 @@ public class Sphere extends SimpleModel {
 
     @Override
     public void draw() {
-        draw(GL.GL_LINE_LOOP);
+        draw(GL.GL_TRIANGLES);
     }
 }

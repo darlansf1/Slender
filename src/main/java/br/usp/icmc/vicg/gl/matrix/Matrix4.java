@@ -145,7 +145,7 @@ public class Matrix4 {
     this.matrix[10] = a02 * b20 + a12 * b21 + a22 * b22;
     this.matrix[11] = a03 * b20 + a13 * b21 + a23 * b22;
   }
-
+  
   public void push() {
     stack.push(this.matrix.clone());
   }

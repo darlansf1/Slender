@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>br.usp.icmc.vicg.gl</groupId>
-  <artifactId>cg2014</artifactId>
-  <name>CG2014</name>
+  <artifactId>slender2016</artifactId>
+  <name>Slender</name>
   <packaging>jar</packaging>
   <version>1.0</version>
 
