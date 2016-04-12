@@ -115,7 +115,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     }
   }
 
-  
+  float x = 0;
+  float z = 0;
   @Override
   public void display(GLAutoDrawable drawable) {
     // Recupera o pipeline
@@ -125,10 +126,19 @@ public class Scene extends KeyAdapter implements GLEventListener {
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
     //float x = alpha*(float)(Math.cos(Math.toRadians(beta))-Math.sin(Math.toRadians(beta)));
-    float x = (float)(alpha*Math.cos(Math.toRadians(beta)));
+    float cosBeta = (float)Math.cos(Math.toRadians(beta));
+    float sinBeta = (float)Math.sin(Math.toRadians(beta));
+    x+= (alpha*cosBeta);
     float y = 0.1f;
     //float z = alpha*(float)(Math.cos(Math.toRadians(beta))+Math.sin(Math.toRadians(beta)));
-    float z = (float)(alpha*Math.sin(Math.toRadians(beta)));
+    z+= (alpha*sinBeta);
+    
+    System.out.println("alpha: "+alpha);
+    System.out.println("beta: "+beta);
+    System.out.println("x: "+x);
+    System.out.println("z: "+z);
+    
+    alpha = 0;
     
     projectionMatrix.loadIdentity();
     projectionMatrix.perspective(45, this.aspect, 0.1f, delta);
@@ -142,7 +152,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix.lookAt(
             0, 0, 0, //onde vc esta
             //(float)(Math.cos(Math.toRadians(beta))-Math.sin(Math.toRadians(beta))), 0, (float)(Math.cos(Math.toRadians(beta))+Math.sin(Math.toRadians(beta))), //pra onde olha
-            (float)(Math.cos(Math.toRadians(beta))), 0,(float)(Math.sin(Math.toRadians(beta))),
+            cosBeta, 0,sinBeta,
             0, 1, 0); //pra cima
     viewMatrix.translate(x, y, z);
     viewMatrix.bind();
@@ -168,7 +178,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
   @Override
   public void keyPressed(KeyEvent e) {
-
+    float step = 0.2f;
     switch (e.getKeyCode()) {
       case KeyEvent.VK_PAGE_UP://faz zoom-in
         delta = delta * 0.809f;
@@ -177,16 +187,18 @@ public class Scene extends KeyAdapter implements GLEventListener {
         delta = delta * 1.1f;
         break;
       case KeyEvent.VK_UP://gira sobre o eixo-x
-        alpha = alpha - 0.1f;
+        //if(alpha > -1)
+            alpha = - step;
         break;
       case KeyEvent.VK_DOWN://gira sobre o eixo-x
-        alpha = alpha + 0.1f;
+        //if(alpha < 1)
+            alpha = + step;
         break;
       case KeyEvent.VK_LEFT://gira sobre o eixo-y
-        beta = beta - 1;
+        beta = beta - 4*step;
         break;
       case KeyEvent.VK_RIGHT://gira sobre o eixo-y
-        beta = beta + 1;
+        beta = beta +4*step;
         break;
     }
   }

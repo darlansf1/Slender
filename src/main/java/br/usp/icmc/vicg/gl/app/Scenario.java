@@ -82,9 +82,9 @@ public class Scenario {
         float min = -100f, max = 100f;
         this.worldSize = max-min;
         
-        for(float x = min; x < max; x += delta+Math.random()*delta){
+        for(float x = min; x < max; x += delta+Math.random()*2*delta){
             ArrayList<ArrayList<Float>> row = new ArrayList<ArrayList<Float>>();
-            for(float z = min; z < max; z += delta+Math.random()*delta){
+            for(float z = min; z < max; z += delta+Math.random()*2*delta){
                 ArrayList<Float> pair = new ArrayList<Float>();
                 pair.add(x);
                 pair.add(z);
