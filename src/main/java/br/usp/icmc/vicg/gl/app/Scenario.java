@@ -20,8 +20,11 @@ public class Scenario {
     private ArrayList<Float> scalex;
     private float worldSize;
     private float minDistance = 0.2f;
+    private float min, max;
 
-    public Scenario() {
+    public Scenario(float min, float max) {
+        this.min = min;
+        this.max = max;
         this.modelMatrix = new Matrix4();
         this.model = new JWavefrontObject(new File("./models/tree/Tree1.obj"));
         this.world = new Sphere();
@@ -83,7 +86,6 @@ public class Scenario {
         
         float angle = 0, delta = 2f;
         ArrayList<ArrayList<ArrayList<Float>>> map = new ArrayList<ArrayList<ArrayList<Float>>>();
-        float min = -100f, max = 100f;
         this.worldSize = max-min;
         
         for(float x = min; x < max; x += delta+Math.random()*2*delta){

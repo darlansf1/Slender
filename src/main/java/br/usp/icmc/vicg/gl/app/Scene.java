@@ -38,6 +38,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private final Matrix4 viewMatrix;
   private final Scenario scenario;
   private final Slender slender;
+  private final AbandonedHouse house;
   private final Light light;
   private float aspect;
   private float alpha;
@@ -54,8 +55,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix = new Matrix4();
 
     //model = new JWavefrontObject(new File("./data/VW-new-beetle.obj"));
-    scenario = new Scenario();
+    scenario = new Scenario(-100.0f, 100.0f);
     slender = new Slender();
+    house = new AbandonedHouse();
     light = new Light();
 
     alpha = 0;
@@ -93,6 +95,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
     initModel(gl, slender.getModelMatrix(), slender.getModel());
+    initModel(gl, house.getModelMatrix(), house.getModel());
     initModel(gl, scenario.getModelMatrix(), scenario.getModel());
     scenario.getWorld().init(gl, shader);
 
@@ -176,6 +179,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
    scenario.draw(-x, -z, delta);
     
     slender.draw(/*beta, alpha*/-x, -z);
+    house.draw(20.0f, 0, 0);
 
     // ForÃ§a execuÃ§Ã£o das operaÃ§Ãµes declaradas
     gl.glFlush();
