@@ -25,10 +25,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 public class Scene extends KeyAdapter implements GLEventListener {
 
@@ -43,6 +43,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private float alpha;
   private float beta;
   private float delta;
+  private SoundEffects sounds;
 
   public Scene(float aspect) {
     this.aspect = aspect;
@@ -101,6 +102,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     light.setDiffuseColor(new float[]{0.75f, 0.75f, 0.75f, 1.0f});
     light.setSpecularColor(new float[]{0.7f, 0.7f, 0.7f, 1.0f});
     light.init(gl, shader);
+    
+    sounds = new SoundEffects();
+    sounds.playSoundEffects();
   }
   
   private void initModel(GL3 gl, Matrix4 modelMatrix, JWavefrontObject model){
@@ -117,6 +121,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
   float x = 0;
   float z = 0;
+  float deltax = 0, deltaz = 0;
   @Override
   public void display(GLAutoDrawable drawable) {
     // Recupera o pipeline
@@ -128,16 +133,26 @@ public class Scene extends KeyAdapter implements GLEventListener {
     //float x = alpha*(float)(Math.cos(Math.toRadians(beta))-Math.sin(Math.toRadians(beta)));
     float cosBeta = (float)Math.cos(Math.toRadians(beta));
     float sinBeta = (float)Math.sin(Math.toRadians(beta));
-    x+= (alpha*cosBeta);
+    float newx = x+(alpha*cosBeta);
     float y = 0.1f;
     //float z = alpha*(float)(Math.cos(Math.toRadians(beta))+Math.sin(Math.toRadians(beta)));
-    z+= (alpha*sinBeta);
+    float newz = z+(alpha*sinBeta);
     
-    System.out.println("alpha: "+alpha);
-    System.out.println("beta: "+beta);
-    System.out.println("x: "+x);
-    System.out.println("z: "+z);
-    
+    //System.out.println("alpha: "+alpha);
+    //System.out.println("beta: "+beta);
+    //System.out.println("x: "+x);
+    //System.out.println("z: "+z);
+    float deltax = newx-x;
+    float deltaz = newz-z;
+    if(!scenario.checkCollision(-newx, -newz)){
+        x = newx;
+        z = newz;
+    }else{
+        deltax = 0;
+        deltaz = 0;
+    }
+    sounds.setDeltax(deltax);
+    sounds.setDeltaz(deltaz);
     alpha = 0;
     
     projectionMatrix.loadIdentity();
@@ -175,7 +190,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     slender.dispose();
     scenario.dispose();
   }
-
+  
   @Override
   public void keyPressed(KeyEvent e) {
     float step = 0.2f;

@@ -5,7 +5,10 @@ import br.usp.icmc.vicg.gl.matrix.Matrix4;
 import br.usp.icmc.vicg.gl.model.SimpleModel;
 import br.usp.icmc.vicg.gl.model.Sphere;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Scenario {
     private final JWavefrontObject model;
@@ -16,6 +19,7 @@ public class Scenario {
     private ArrayList<Float> scaley;
     private ArrayList<Float> scalex;
     private float worldSize;
+    private float minDistance = 0.2f;
 
     public Scenario() {
         this.modelMatrix = new Matrix4();
@@ -98,5 +102,22 @@ public class Scenario {
         }
         
         return map;
+    }
+
+    public boolean checkCollision(float x, float z) {
+        for(int i = 0; i < map.size(); i++)
+            for(int j = 0; j < map.get(i).size(); j++){
+                //System.out.printf("deltax: %f, deltaz: %f\n", Math.abs(map.get(i).get(j).get(0)-x), Math.abs(map.get(i).get(j).get(1) - z));
+                if(Math.abs(map.get(i).get(j).get(0)-x) < minDistance && 
+                       Math.abs(map.get(i).get(j).get(1) - z) < minDistance){
+                  //  try {
+                    //    System.in.read();
+                    //} catch (IOException ex) {
+                      //  Logger.getLogger(Scenario.class.getName()).log(Level.SEVERE, null, ex);
+                    //}
+                    return true;
+                }
+            }
+        return false;
     }
 }
