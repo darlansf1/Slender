@@ -178,7 +178,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
    scenario.draw(-x, -z, delta);
     
-    slender.draw(/*beta, alpha*/-x, -z);
+    slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, delta);
     house.draw(20.0f, 0, 0);
 
     // ForÃ§a execuÃ§Ã£o das operaÃ§Ãµes declaradas
