@@ -19,7 +19,11 @@ public class AbandonedHouse {
     
     public AbandonedHouse() {
         this.modelMatrix = new Matrix4();
-        this.model = new JWavefrontObject(new File("./models/AbandonedHouse/Farmhouse.obj"));
+        if (new File("./models/Farmhouse/OBJ/Farmhouse_OBJ.obj").exists())
+            System.out.println("ARQUIVO OBJ EXISTE");
+        else
+            System.out.println("ARQUIVO OBJ NAO EXISTE, SE FUDEU");
+        this.model = new JWavefrontObject(new File("./models/Farmhouse/OBJ/Farmhouse_OBJ.obj"));
     }
     
     public JWavefrontObject getModel() {
@@ -33,7 +37,7 @@ public class AbandonedHouse {
     public void draw(float x, float y, float z){
         modelMatrix.loadIdentity();
         modelMatrix.translate(x, y, z);
-        modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+        //modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
         modelMatrix.rotate(90.0f, 0.0f, 1.0f, 0.0f);
         modelMatrix.scale(4.0f, 4.0f, 4.0f);
         modelMatrix.bind();

@@ -190,7 +190,6 @@ public class JWavefrontObject {
 
       while ((line = in.readLine()) != null) {
         line = line.trim();
-
         if (line.length() > 0) {
           switch (line.charAt(0)) {
             case '#': /* comment */
@@ -236,9 +235,10 @@ public class JWavefrontObject {
 
               tok = new StringTokenizer(line, " ");
               token = tok.nextToken(); //ignores mtllib
-
+              System.out.println(line);
               if (token.equals("mtllib")) {
                 token = tok.nextToken();
+                System.out.println("TOKEN MTL: "+token);
                 parse_mtl(token);
               } else {
                 Logger.getLogger(JWavefrontObject.class.getName()).log(Level.WARNING,
@@ -565,7 +565,7 @@ public class JWavefrontObject {
    */
   private void parse_mtl(String name) throws IOException {
     File file = new File(pathname.getParent() + "/" + name);
-
+    System.out.println("ARQUIVO MTL: "+pathname.getParent() + "/" + name);
     if (file.exists()) {
       BufferedReader in = null;
       StringTokenizer tok;
