@@ -3,6 +3,7 @@
 struct LightProperties
 { 
     vec4 position;
+    vec4 direction;
     vec4 ambientColor;
     vec4 diffuseColor;
     vec4 specularColor;
@@ -34,7 +35,8 @@ void main(void)
 {
     vec3 normal = normalize(v_normal);
 
-    vec3 light_dir = vec3((u_viewMatrix * u_modelMatrix * u_light.position) - v_position);
+    vec3 light_dir = vec3(u_light.direction);
+    //vec3 light_dir = vec3((u_viewMatrix * u_modelMatrix * u_light.position) - v_position);
 
     float d = length(light_dir);
 	float att = 1.0 / (u_light.constantAttenuation + 

@@ -33,11 +33,13 @@ out vec4 fragColor;
 
 void main(void)
 {
+    vec3 normal = normalize(v_normal);
+    
+    vec3 direction = normalize(vec3((u_viewMatrix * u_modelMatrix * u_light.position) - v_position));
+
     vec4 color = u_light.ambientColor * u_material.ambientColor;
 
-	vec3 normal = normalize(v_normal);
-
-    vec3 direction = normalize(vec3((u_viewMatrix * u_modelMatrix * u_light.position) - v_position));
+    
 
 	float nDotL = max(dot(direction, normal), 0.0);
 

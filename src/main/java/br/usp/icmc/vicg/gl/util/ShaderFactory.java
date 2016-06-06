@@ -20,7 +20,8 @@ public class ShaderFactory {
     LIGHT_SHADER,
     TEXTURE_SHADER,
     NORMALMAP_SHADER,
-    COMPLETE_SHADER
+    COMPLETE_SHADER,
+    SPOTLIGHT_SHADER
   };
 
   public static Shader getInstance(ShaderType type) {
@@ -42,6 +43,8 @@ public class ShaderFactory {
       return new Shader("normalmap_vertex.glsl", "normalmap_fragment.glsl");
     } else if (type == ShaderType.COMPLETE_SHADER) {
       return new Shader("complete_vertex.glsl", "complete_fragment.glsl");
+    } else if (type == ShaderType.SPOTLIGHT_SHADER) {
+      return new Shader("flashlight_vertex.glsl", "flashlight_fragment.glsl");
     }
     return null;
   }

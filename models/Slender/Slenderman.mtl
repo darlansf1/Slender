@@ -1,0 +1,10 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v3.1.187496374)
+
+newmtl Tex_0666_0_dds
+Kd 1.0 1.0 1.0
+Ka 0 0 0
+Ks 0.1 0.1 0.1
+#d 1
+#illum 1
+map_Kd Tex_0666_0.PNG

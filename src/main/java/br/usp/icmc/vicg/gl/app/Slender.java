@@ -64,7 +64,7 @@ public class Slender {
         //modelMatrix.rotate(alpha, 1.0f, 0, 0);
         //modelMatrix.translate(3, 0, 1.5f);
         modelMatrix.rotate(-90, 0, 1.0f, 0);
-        modelMatrix.rotate(-90, 1.0f, 0, 0);
+        //modelMatrix.rotate(-90, 1.0f, 0, 0);
         modelMatrix.bind();
         return toDraw;
     }

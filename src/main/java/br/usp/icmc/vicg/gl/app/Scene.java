@@ -3,6 +3,8 @@ package br.usp.icmc.vicg.gl.app;
 import br.usp.icmc.vicg.gl.core.Light;
 import br.usp.icmc.vicg.gl.jwavefront.JWavefrontObject;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
+import br.usp.icmc.vicg.gl.model.Rectangle;
+import br.usp.icmc.vicg.gl.model.Sphere;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -21,13 +23,16 @@ import br.usp.icmc.vicg.gl.util.ShaderFactory.ShaderType;
 
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
+import static com.sun.java.accessibility.util.AWTEventMonitor.addMouseListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 
 
 public class Scene extends KeyAdapter implements GLEventListener {
@@ -38,6 +43,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private final Matrix4 viewMatrix;
   private final Scenario scenario;
   private final Slender slender;
+  private final Border border;
   private final AbandonedHouse house;
   private final Light light;
   private float aspect;
@@ -49,7 +55,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
   public Scene(float aspect) {
     this.aspect = aspect;
     // Carrega os shaders
-    shader = ShaderFactory.getInstance(ShaderType.COMPLETE_SHADER);
+    shader = ShaderFactory.getInstance(ShaderType.SPOTLIGHT_SHADER);
+    //shader = ShaderFactory.getInstance(ShaderType.SPOTLIGHT_SHADER);
    // modelMatrix = new Matrix4();
     projectionMatrix = new Matrix4();
     viewMatrix = new Matrix4();
@@ -57,6 +64,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     //model = new JWavefrontObject(new File("./data/VW-new-beetle.obj"));
     scenario = new Scenario(-100.0f, 100.0f);
     slender = new Slender();
+    border = new Border();
     house = new AbandonedHouse();
     light = new Light();
 
@@ -77,11 +85,13 @@ public class Scene extends KeyAdapter implements GLEventListener {
     // Print OpenGL version
     System.out.println("OpenGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n");
 
-    gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //gl.glClearColor(0.025f, 0.025f, 0.025f, 1.0f);
+    gl.glClearColor(0.025f, 0.025f, 0.025f, 1.0f);
     gl.glClearDepth(1.0f);
 
     gl.glEnable(GL.GL_DEPTH_TEST);
     gl.glEnable(GL.GL_CULL_FACE);
+    gl.glCullFace(GL.GL_BACK);
 
     //inicializa os shaders
     shader.init(gl);
@@ -95,15 +105,26 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
     initModel(gl, slender.getModelMatrix(), slender.getModel());
+    //initModel(gl, border.getModelMatrix(), border.getModel());
     initModel(gl, house.getModelMatrix(), house.getModel());
     initModel(gl, scenario.getModelMatrix(), scenario.getModel());
     scenario.getWorld().init(gl, shader);
 
     //init the light
-    light.setPosition(new float[]{10, 10, 50, 1.0f});
-    light.setAmbientColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
-    light.setDiffuseColor(new float[]{0.75f, 0.75f, 0.75f, 1.0f});
-    light.setSpecularColor(new float[]{0.7f, 0.7f, 0.7f, 1.0f});
+    light.setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+    light.setAmbientColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+    light.setDiffuseColor(new float[]{0.8f, 0.8f, 0.8f, 1.0f});
+    light.setSpecularColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
+    light.setConstantAttenuation(0.9f);
+    light.setLinearAttenuation(0.1f);
+    light.setQuadraticAttenuation(0.03f);
+    /*light.setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+    light.setDirection(new float[]{0.0f, 0.0f, 1.0f, 1.0f});
+    light.setAmbientColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+    light.setDiffuseColor(new float[]{0.2f, 0.2f, 0.2f, 1.0f});
+    light.setSpecularColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
+    light.setQuadraticAttenuation(0.2f);
+    light.setCutoffAngle(90.0f);*/
     light.init(gl, shader);
     
     sounds = new SoundEffects();
@@ -137,7 +158,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     float cosBeta = (float)Math.cos(Math.toRadians(beta));
     float sinBeta = (float)Math.sin(Math.toRadians(beta));
     float newx = x+(alpha*cosBeta);
-    float y = 0.1f;
+    float y = 0.5f;
     //float z = alpha*(float)(Math.cos(Math.toRadians(beta))+Math.sin(Math.toRadians(beta)));
     float newz = z+(alpha*sinBeta);
     
@@ -159,7 +180,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     alpha = 0;
     
     projectionMatrix.loadIdentity();
-    projectionMatrix.perspective(45, this.aspect, 0.1f, delta);
+    projectionMatrix.perspective(60, this.aspect, 0.01f, delta);
     /*projectionMatrix.ortho(
             -delta, delta, 
             -delta, delta, 
@@ -170,16 +191,18 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix.lookAt(
             0, 0, 0, //onde vc esta
             //(float)(Math.cos(Math.toRadians(beta))-Math.sin(Math.toRadians(beta))), 0, (float)(Math.cos(Math.toRadians(beta))+Math.sin(Math.toRadians(beta))), //pra onde olha
-            cosBeta, 0,sinBeta,
+            cosBeta, -0.1f,sinBeta,
             0, 1, 0); //pra cima
     viewMatrix.translate(x, y, z);
     viewMatrix.bind();
     light.bind();
     
-   scenario.draw(-x, -z, delta);
+    scenario.draw(-x, -z, delta);
     
     slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, delta);
+    //border.draw();
     house.draw(20.0f, 0, 0);
+    
 
     // ForÃ§a execuÃ§Ã£o das operaÃ§Ãµes declaradas
     gl.glFlush();
@@ -192,33 +215,39 @@ public class Scene extends KeyAdapter implements GLEventListener {
   @Override
   public void dispose(GLAutoDrawable drawable) {
     slender.dispose();
+    border.dispose();
     scenario.dispose();
   }
   
   @Override
   public void keyPressed(KeyEvent e) {
     float step = 0.2f;
+    
     switch (e.getKeyCode()) {
-      case KeyEvent.VK_PAGE_UP://faz zoom-in
-        delta = delta * 0.809f;
-        break;
-      case KeyEvent.VK_PAGE_DOWN://faz zoom-out
-        delta = delta * 1.1f;
-        break;
-      case KeyEvent.VK_UP://gira sobre o eixo-x
-        //if(alpha > -1)
-            alpha = - step;
-        break;
-      case KeyEvent.VK_DOWN://gira sobre o eixo-x
-        //if(alpha < 1)
-            alpha = + step;
-        break;
-      case KeyEvent.VK_LEFT://gira sobre o eixo-y
-        beta = beta - 4*step;
-        break;
-      case KeyEvent.VK_RIGHT://gira sobre o eixo-y
-        beta = beta +4*step;
-        break;
+        case KeyEvent.VK_PAGE_UP://faz zoom-in
+            delta = delta * 0.809f;
+            break;
+        case KeyEvent.VK_PAGE_DOWN://faz zoom-out
+            delta = delta * 1.1f;
+            break;
+        case KeyEvent.VK_W:
+        case KeyEvent.VK_UP://gira sobre o eixo-x
+            //if(alpha > -1)
+                alpha = - step;
+            break;
+        case KeyEvent.VK_S:
+        case KeyEvent.VK_DOWN://gira sobre o eixo-x
+            //if(alpha < 1)
+                alpha = + step;
+            break;
+        case KeyEvent.VK_A:
+        case KeyEvent.VK_LEFT://gira sobre o eixo-y
+            beta = beta - 4*step;
+            break;
+        case KeyEvent.VK_D:
+        case KeyEvent.VK_RIGHT://gira sobre o eixo-y
+            beta = beta +4*step;
+            break;
     }
   }
 
@@ -233,16 +262,17 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
     // Create canvas
     GLCanvas glCanvas = new GLCanvas(glcaps);
-
     int width = 600, height = 600;
     
     // Add listener to panel
     final Scene listener = new Scene((float)width/height);
+    
     glCanvas.addGLEventListener(listener);
 
-    final Frame frame = new Frame("Example 09");
+    final JFrame frame = new JFrame("Slender");
     frame.setSize(width, height);
     frame.add(glCanvas);
+    //frame.addMouseListener(listener);
     frame.addKeyListener(listener);
     final AnimatorBase animator = new FPSAnimator(glCanvas, 60);
 

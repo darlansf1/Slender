@@ -49,9 +49,6 @@ public class Scenario {
     }
 
     public void draw(float x, float z, float delta) {
-       // System.out.println("x: "+x);
-        //System.out.println("z: "+z);
-        //System.out.println("delta: "+delta);
         int count = 0;
         for(int i = 0; i < map.size(); i++)
             for(int j = 0; j < map.get(i).size(); j++){
@@ -73,8 +70,8 @@ public class Scenario {
         modelMatrix.loadIdentity();
         modelMatrix.translate(x, y, z);
         modelMatrix.scale(scale_x, scale_y, (Math.abs(scale_x)+Math.abs(scale_y))/2);
-        modelMatrix.rotate(angle_y, 0, 1.0f, 0);
-        modelMatrix.rotate(-90, 1.0f, 0, 0);
+        //modelMatrix.rotate(angle_y, 0, 1.0f, 0);
+        //modelMatrix.rotate(-90, 1.0f, 0, 0);
         modelMatrix.bind();
         model.draw();
     }
