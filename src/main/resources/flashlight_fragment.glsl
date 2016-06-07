@@ -46,14 +46,14 @@ void main(void){
 	if (lDotN > 0.0){
 		float intensity = max(dot(n, l), 0.0);
 		if(u_is_texture)
-	        diffuse = intensity * texture(u_texture, v_texcoord) * lDotN;
+	        diffuse = intensity * u_light.diffuseColor * texture(u_texture, v_texcoord);
 	    else
-	        diffuse = intensity * u_light.diffuseColor * u_material.diffuseColor * lDotN;
-		    
+	        diffuse = intensity * u_light.diffuseColor * u_material.diffuseColor;
+		
 		    
 		if (intensity > 0.0){
 			vec3 r = reflect(-l, n);
-			float specExponent = pow(max(dot(r, n), 0.0), u_material.specularExponent);
+			float specExponent = pow(max(dot(r, l), 0.0), u_material.specularExponent);
 			specular = u_light.specularColor * u_material.specularColor * specExponent;
 		}
 	}
@@ -64,7 +64,7 @@ void main(void){
 	            (u_light.linearAttenuation*d) + 
 	            (u_light.quadraticAttenuation*d*d));
 		
-	if(magicalangle > 0.9838 && magicalangle < 0.984){
+	if(magicalangle > 0.498 && magicalangle < 0.5){
 		att = att*0.35;
 	}else if (magicalangle < 0.98){
 		att = att*0.5;
