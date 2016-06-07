@@ -30,6 +30,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -46,14 +47,20 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private final Border border;
   private final AbandonedHouse house;
   private final Light light;
+  //private final Rectangle floor;
   private float aspect;
-  private float alpha;
-  private float beta;
-  private float delta;
   private SoundEffects sounds;
+  
+    //controle de comandos
+    private HashMap<Integer, Boolean>  pressedKeys;
+    private float frentestep;
+    private float virastep;
+    private float campodevisao;
+    private float cimastep;
 
   public Scene(float aspect) {
     this.aspect = aspect;
+    this.pressedKeys = new HashMap<Integer, Boolean>();
     // Carrega os shaders
     shader = ShaderFactory.getInstance(ShaderType.SPOTLIGHT_SHADER);
     //shader = ShaderFactory.getInstance(ShaderType.SPOTLIGHT_SHADER);
@@ -67,10 +74,12 @@ public class Scene extends KeyAdapter implements GLEventListener {
     border = new Border();
     house = new AbandonedHouse();
     light = new Light();
+    //floor = new Rectangle();
 
-    alpha = 0;
-    beta = 0;
-    delta = 20;
+    frentestep = 0;
+    virastep = 0;
+    campodevisao = 20;
+    cimastep = 0;
   }
   
   public void setAspect(float aspect){
@@ -86,10 +95,11 @@ public class Scene extends KeyAdapter implements GLEventListener {
     System.out.println("OpenGL Version: " + gl.glGetString(GL.GL_VERSION) + "\n");
 
     //gl.glClearColor(0.025f, 0.025f, 0.025f, 1.0f);
-    gl.glClearColor(0.025f, 0.025f, 0.025f, 1.0f);
+    gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gl.glClearDepth(1.0f);
 
     gl.glEnable(GL.GL_DEPTH_TEST);
+    
     gl.glEnable(GL.GL_CULL_FACE);
     gl.glCullFace(GL.GL_BACK);
 
@@ -112,19 +122,12 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
     //init the light
     light.setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
-    light.setAmbientColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+    light.setAmbientColor(new float[]{0.025f, 0.025f, 0.025f, 1.0f});
     light.setDiffuseColor(new float[]{0.8f, 0.8f, 0.8f, 1.0f});
-    light.setSpecularColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
+    light.setSpecularColor(new float[]{0.2f, 0.2f, 0.2f, 1.0f});
     light.setConstantAttenuation(0.9f);
-    light.setLinearAttenuation(0.1f);
+    light.setLinearAttenuation(0.05f);
     light.setQuadraticAttenuation(0.03f);
-    /*light.setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
-    light.setDirection(new float[]{0.0f, 0.0f, 1.0f, 1.0f});
-    light.setAmbientColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
-    light.setDiffuseColor(new float[]{0.2f, 0.2f, 0.2f, 1.0f});
-    light.setSpecularColor(new float[]{0.1f, 0.1f, 0.1f, 1.0f});
-    light.setQuadraticAttenuation(0.2f);
-    light.setCutoffAngle(90.0f);*/
     light.init(gl, shader);
     
     sounds = new SoundEffects();
@@ -153,19 +156,16 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
-
-    //float x = alpha*(float)(Math.cos(Math.toRadians(beta))-Math.sin(Math.toRadians(beta)));
-    float cosBeta = (float)Math.cos(Math.toRadians(beta));
-    float sinBeta = (float)Math.sin(Math.toRadians(beta));
-    float newx = x+(alpha*cosBeta);
-    float y = 0.5f;
-    //float z = alpha*(float)(Math.cos(Math.toRadians(beta))+Math.sin(Math.toRadians(beta)));
-    float newz = z+(alpha*sinBeta);
     
-    //System.out.println("alpha: "+alpha);
-    //System.out.println("beta: "+beta);
-    //System.out.println("x: "+x);
-    //System.out.println("z: "+z);
+    processKeyEvents();
+
+    float y = 0.1f; // altura da camera
+    float cosBeta = (float)Math.cos(Math.toRadians(virastep)); // vira
+    float sinBeta = (float)Math.sin(Math.toRadians(virastep));
+    float cosBetaComp = (float)Math.cos(Math.toRadians(virastep-180)); // vira
+    float sinBetaComp = (float)Math.sin(Math.toRadians(virastep-180));
+    float newx = x+(frentestep*cosBeta);
+    float newz = z+(frentestep*sinBeta);
     float deltax = newx-x;
     float deltaz = newz-z;
     if(!scenario.checkCollision(-newx, -newz)){
@@ -177,29 +177,26 @@ public class Scene extends KeyAdapter implements GLEventListener {
     }
     sounds.setDeltax(deltax);
     sounds.setDeltaz(deltaz);
-    alpha = 0;
+    
+    //zera movimento de camera
+    frentestep = 0;
     
     projectionMatrix.loadIdentity();
-    projectionMatrix.perspective(60, this.aspect, 0.01f, delta);
-    /*projectionMatrix.ortho(
-            -delta, delta, 
-            -delta, delta, 
-            -20 * delta, 20 * delta);*/
+    projectionMatrix.perspective(60, this.aspect, 0.01f, campodevisao);
     projectionMatrix.bind();
 
     viewMatrix.loadIdentity();
     viewMatrix.lookAt(
             0, 0, 0, //onde vc esta
-            //(float)(Math.cos(Math.toRadians(beta))-Math.sin(Math.toRadians(beta))), 0, (float)(Math.cos(Math.toRadians(beta))+Math.sin(Math.toRadians(beta))), //pra onde olha
-            cosBeta, -0.1f,sinBeta,
+            cosBeta, cimastep, sinBeta, //pra onde olha
             0, 1, 0); //pra cima
-    viewMatrix.translate(x, y, z);
+    viewMatrix.translate(x, y, z); //seta posicao da camera
     viewMatrix.bind();
     light.bind();
     
-    scenario.draw(-x, -z, delta);
+    scenario.draw(-x, -z, campodevisao);
     
-    slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, delta);
+    slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao);
     //border.draw();
     house.draw(20.0f, 0, 0);
     
@@ -218,35 +215,95 @@ public class Scene extends KeyAdapter implements GLEventListener {
     border.dispose();
     scenario.dispose();
   }
+        
+    private void processKeyEvents(){
+        float step;
+        if (pressedKeys.containsKey(KeyEvent.VK_SHIFT) && pressedKeys.get(KeyEvent.VK_SHIFT))
+            step = 0.2f; //correndo
+        else
+            step = 0.1f; //andando deboas pelo vale das sombras
+        
+        if (pressedKeys.containsKey(KeyEvent.VK_PAGE_UP) && pressedKeys.get(KeyEvent.VK_PAGE_UP)) //aumenta campo de visao
+            campodevisao = campodevisao * 0.809f;
+        if (pressedKeys.containsKey(KeyEvent.VK_PAGE_DOWN) && pressedKeys.get(KeyEvent.VK_PAGE_DOWN)) //diminui campo de visao
+            campodevisao = campodevisao * 1.1f;
+        if (pressedKeys.containsKey(KeyEvent.VK_W) && pressedKeys.get(KeyEvent.VK_W)) // olha pra cima
+            if (cimastep+step <= 1.0)
+                cimastep += step;
+        if (pressedKeys.containsKey(KeyEvent.VK_S) && pressedKeys.get(KeyEvent.VK_S)) // olha pra baixo
+            if (cimastep-step >= -1.0)
+                cimastep -= step;
+        if (pressedKeys.containsKey(KeyEvent.VK_A) && pressedKeys.get(KeyEvent.VK_A)) // vira pra esquerda
+            virastep = virastep - 10*step;
+        if (pressedKeys.containsKey(KeyEvent.VK_D) && pressedKeys.get(KeyEvent.VK_D)) // vira pra direita
+            virastep = virastep + 10*step;
+        if (pressedKeys.containsKey(KeyEvent.VK_UP) && pressedKeys.get(KeyEvent.VK_UP)) // anda pra frente
+            frentestep = - step;
+        if (pressedKeys.containsKey(KeyEvent.VK_DOWN) && pressedKeys.get(KeyEvent.VK_DOWN)) // anda pra tras
+            frentestep = step;        
+    }
   
   @Override
   public void keyPressed(KeyEvent e) {
-    float step = 0.2f;
-    
     switch (e.getKeyCode()) {
-        case KeyEvent.VK_PAGE_UP://faz zoom-in
-            delta = delta * 0.809f;
+        case KeyEvent.VK_PAGE_UP:
+            pressedKeys.put(KeyEvent.VK_PAGE_UP, true);
             break;
-        case KeyEvent.VK_PAGE_DOWN://faz zoom-out
-            delta = delta * 1.1f;
+        case KeyEvent.VK_PAGE_DOWN:
+            pressedKeys.put(KeyEvent.VK_PAGE_DOWN, true);
             break;
         case KeyEvent.VK_W:
-        case KeyEvent.VK_UP://gira sobre o eixo-x
-            //if(alpha > -1)
-                alpha = - step;
+            pressedKeys.put(KeyEvent.VK_W, true);
             break;
         case KeyEvent.VK_S:
-        case KeyEvent.VK_DOWN://gira sobre o eixo-x
-            //if(alpha < 1)
-                alpha = + step;
+            pressedKeys.put(KeyEvent.VK_S, true);
             break;
         case KeyEvent.VK_A:
-        case KeyEvent.VK_LEFT://gira sobre o eixo-y
-            beta = beta - 4*step;
+            pressedKeys.put(KeyEvent.VK_A, true);
             break;
         case KeyEvent.VK_D:
-        case KeyEvent.VK_RIGHT://gira sobre o eixo-y
-            beta = beta +4*step;
+            pressedKeys.put(KeyEvent.VK_D, true);
+            break;
+        case KeyEvent.VK_UP:
+            pressedKeys.put(KeyEvent.VK_UP, true);
+            break;
+        case KeyEvent.VK_DOWN:
+            pressedKeys.put(KeyEvent.VK_DOWN, true);
+            break;
+        case KeyEvent.VK_SHIFT:
+            pressedKeys.put(KeyEvent.VK_SHIFT, true);
+            break;
+    }
+  }
+  
+  public void keyReleased(KeyEvent e) {
+      switch (e.getKeyCode()) {
+        case KeyEvent.VK_PAGE_UP:
+            pressedKeys.put(KeyEvent.VK_PAGE_UP, false);
+            break;
+        case KeyEvent.VK_PAGE_DOWN:
+            pressedKeys.put(KeyEvent.VK_PAGE_DOWN, false);
+            break;
+        case KeyEvent.VK_W:
+            pressedKeys.put(KeyEvent.VK_W, false);
+            break;
+        case KeyEvent.VK_S:
+            pressedKeys.put(KeyEvent.VK_S, false);
+            break;
+        case KeyEvent.VK_A:
+            pressedKeys.put(KeyEvent.VK_A, false);
+            break;
+        case KeyEvent.VK_D:
+            pressedKeys.put(KeyEvent.VK_D, false);
+            break;
+        case KeyEvent.VK_UP:
+            pressedKeys.put(KeyEvent.VK_UP, false);
+            break;
+        case KeyEvent.VK_DOWN:
+            pressedKeys.put(KeyEvent.VK_DOWN, false);
+            break;
+        case KeyEvent.VK_SHIFT:
+            pressedKeys.put(KeyEvent.VK_SHIFT, false);
             break;
     }
   }

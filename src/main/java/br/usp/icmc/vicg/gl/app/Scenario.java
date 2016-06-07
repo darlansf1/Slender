@@ -50,6 +50,7 @@ public class Scenario {
 
     public void draw(float x, float z, float delta) {
         int count = 0;
+        delta = delta/2;
         for(int i = 0; i < map.size(); i++)
             for(int j = 0; j < map.get(i).size(); j++){
                 if(map.get(i).get(j).get(0) >= x-delta && map.get(i).get(j).get(0) <= x+delta
@@ -81,7 +82,7 @@ public class Scenario {
         this.scaley = new ArrayList<Float>();
         this.scalex = new ArrayList<Float>();
         
-        float angle = 0, delta = 2f;
+        float angle = 0, delta = 1.0f;
         ArrayList<ArrayList<ArrayList<Float>>> map = new ArrayList<ArrayList<ArrayList<Float>>>();
         this.worldSize = max-min;
         

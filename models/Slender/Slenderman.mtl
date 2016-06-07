@@ -4,7 +4,7 @@
 newmtl Tex_0666_0_dds
 Kd 1.0 1.0 1.0
 Ka 0 0 0
-Ks 0.1 0.1 0.1
+Ks 0.3 0.3 0.3
 #d 1
 #illum 1
 map_Kd Tex_0666_0.PNG

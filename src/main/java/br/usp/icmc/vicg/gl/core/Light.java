@@ -14,7 +14,6 @@ public class Light {
   private float[] diffuseColor;
   private float[] specularColor;
   private float[] position;
-  private float[] direction;
   private float specularExponent;
   private float constAttenuation;
   private float linAttenuation;
@@ -24,7 +23,6 @@ public class Light {
   private int linattHandle;
   private int quadattHandle;
   private int positionHandle;
-  private int directionHandle;
   private int specularExponentHandle;
   private int ambientColorHandle;
   private int diffuseColorHandle;
@@ -32,7 +30,6 @@ public class Light {
 
   public Light() {
     setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
-    setDirection(new float[]{0.0f, 0.0f, 1.0f, 1.0f});
     setAmbientColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
     setDiffuseColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
     setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
@@ -43,10 +40,6 @@ public class Light {
 
   public final void setPosition(float[] position) {
     this.position = Arrays.copyOf(position, position.length);
-  }
-  
-  public final void setDirection(float[] direction) {
-    this.direction = Arrays.copyOf(direction, direction.length);
   }
 
   public final void setAmbientColor(float[] ambientColor) {
@@ -77,7 +70,6 @@ public class Light {
     this.gl = gl;
     
     this.positionHandle = shader.getUniformLocation("u_light.position");
-    this.directionHandle = shader.getUniformLocation("u_light.direction");
     this.ambientColorHandle = shader.getUniformLocation("u_light.ambientColor");
     this.diffuseColorHandle = shader.getUniformLocation("u_light.diffuseColor");
     this.specularColorHandle = shader.getUniformLocation("u_light.specularColor");
@@ -89,7 +81,6 @@ public class Light {
 
   public void bind() {
     gl.glUniform4fv(positionHandle, 1, Buffers.newDirectFloatBuffer(position));
-    gl.glUniform4fv(directionHandle, 1, Buffers.newDirectFloatBuffer(direction));
     gl.glUniform4fv(ambientColorHandle, 1, Buffers.newDirectFloatBuffer(ambientColor));
     gl.glUniform4fv(diffuseColorHandle, 1, Buffers.newDirectFloatBuffer(diffuseColor));
     gl.glUniform4fv(specularColorHandle, 1, Buffers.newDirectFloatBuffer(specularColor));
