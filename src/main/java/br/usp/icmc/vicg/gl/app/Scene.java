@@ -159,7 +159,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
     processKeyEvents();
 
-    float y = 0.1f; // altura da camera
+    float y = 0.5f; // altura da camera
     float cosBeta = (float)Math.cos(Math.toRadians(virastep)); // vira
     float sinBeta = (float)Math.sin(Math.toRadians(virastep));
     float cosBetaComp = (float)Math.cos(Math.toRadians(virastep-180)); // vira
@@ -168,7 +168,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     float newz = z+(frentestep*sinBeta);
     float deltax = newx-x;
     float deltaz = newz-z;
-    if(!scenario.checkCollision(-newx, -newz)){
+    if(!scenario.checkCollision(-newx, -newz, slender, this)){
         x = newx;
         z = newz;
     }else{
@@ -196,12 +196,22 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
     scenario.draw(-x, -z, campodevisao);
     
-    slender.draw(-x, -z, cosBeta, sinBeta, campodevisao);
+    slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
+    //border.draw();
     house.draw(20.0f, 0, 0);
     
 
     // ForÃ§a execuÃ§Ã£o das operaÃ§Ãµes declaradas
     gl.glFlush();
+  }
+  
+  public boolean endGame(boolean hasWon){
+      try{
+        
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return true;
   }
 
   @Override
@@ -232,18 +242,14 @@ public class Scene extends KeyAdapter implements GLEventListener {
         if (pressedKeys.containsKey(KeyEvent.VK_S) && pressedKeys.get(KeyEvent.VK_S)) // olha pra baixo
             if (cimastep-step >= -1.0)
                 cimastep -= step;
-        if (pressedKeys.containsKey(KeyEvent.VK_UP) && pressedKeys.get(KeyEvent.VK_UP)) // anda pra frente
-            frentestep = -step;
-        if (pressedKeys.containsKey(KeyEvent.VK_DOWN) && pressedKeys.get(KeyEvent.VK_DOWN)) // anda pra tras
-            frentestep = +step;  
-        if (pressedKeys.containsKey(KeyEvent.VK_A) && pressedKeys.get(KeyEvent.VK_A)){ // vira pra esquerda
+        if (pressedKeys.containsKey(KeyEvent.VK_A) && pressedKeys.get(KeyEvent.VK_A)) // vira pra esquerda
             virastep = virastep - 10*step;
-            frentestep /= 2.0f;
-        }
-        if (pressedKeys.containsKey(KeyEvent.VK_D) && pressedKeys.get(KeyEvent.VK_D)){ // vira pra direita
+        if (pressedKeys.containsKey(KeyEvent.VK_D) && pressedKeys.get(KeyEvent.VK_D)) // vira pra direita
             virastep = virastep + 10*step;
-            frentestep /= 2.0f;
-        }
+        if (pressedKeys.containsKey(KeyEvent.VK_UP) && pressedKeys.get(KeyEvent.VK_UP)) // anda pra frente
+            frentestep = - step;
+        if (pressedKeys.containsKey(KeyEvent.VK_DOWN) && pressedKeys.get(KeyEvent.VK_DOWN)) // anda pra tras
+            frentestep = step;        
     }
   
   @Override

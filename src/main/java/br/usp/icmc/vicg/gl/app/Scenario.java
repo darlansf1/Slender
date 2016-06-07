@@ -55,7 +55,7 @@ public class Scenario {
             for(int j = 0; j < map.get(i).size(); j++){
                 if(map.get(i).get(j).get(0) >= x-delta && map.get(i).get(j).get(0) <= x+delta
                         && map.get(i).get(j).get(1) >= z-delta && map.get(i).get(j).get(1) <= z+delta)
-                    drawTree(map.get(i).get(j).get(0), 0.5f, map.get(i).get(j).get(1), theta.get(count), scalex.get(count), scaley.get(count));
+                    drawTree(map.get(i).get(j).get(0), -0.1f, map.get(i).get(j).get(1), theta.get(count), scalex.get(count), scaley.get(count));
                 count++;
             }
         
@@ -82,19 +82,22 @@ public class Scenario {
         this.scaley = new ArrayList<Float>();
         this.scalex = new ArrayList<Float>();
         
-        float angle = 0, delta = 1.0f;
+        float angle = 0, delta = 1.2f;
         ArrayList<ArrayList<ArrayList<Float>>> map = new ArrayList<ArrayList<ArrayList<Float>>>();
         this.worldSize = max-min;
+        float houseSpace = 5.5f;
         
         for(float x = min; x < max; x += delta+Math.random()*2*delta){
             ArrayList<ArrayList<Float>> row = new ArrayList<ArrayList<Float>>();
             for(float z = min; z < max; z += delta+Math.random()*2*delta){
+                if(Math.abs(x-AbandonedHouse.X) < houseSpace && Math.abs(z-AbandonedHouse.Z) < houseSpace)
+                    continue;
                 ArrayList<Float> pair = new ArrayList<Float>();
                 pair.add(x);
                 pair.add(z);
                 this.theta.add(angle);
                 this.scaley.add(1f+0.5f*(float)Math.random());
-                this.scalex.add(1f+0.5f*(float)Math.random());
+                this.scalex.add(2f+1f*(float)Math.random());
                 angle += Math.random()*delta*10;
                 row.add(pair);
             }
@@ -104,7 +107,7 @@ public class Scenario {
         return map;
     }
 
-    public boolean checkCollision(float x, float z) {
+    public boolean checkCollision(float x, float z, Slender slender, Scene scene) {
         for(int i = 0; i < map.size(); i++)
             for(int j = 0; j < map.get(i).size(); j++){
                 //System.out.printf("deltax: %f, deltaz: %f\n", Math.abs(map.get(i).get(j).get(0)-x), Math.abs(map.get(i).get(j).get(1) - z));
@@ -117,6 +120,11 @@ public class Scenario {
                     //}
                     return true;
                 }
+                float houseColision = 4f;
+                if(Math.abs(x-AbandonedHouse.X) < houseColision && Math.abs(z-AbandonedHouse.Z) < houseColision/4)
+                    return scene.endGame(true);
+                if(Math.abs(x-slender.getX()) < minDistance && Math.abs(z-slender.getZ()) < minDistance)
+                    return scene.endGame(false);
             }
         return false;
     }

@@ -16,6 +16,9 @@ import java.io.File;
 public class AbandonedHouse {
     private final JWavefrontObject model;
     private final Matrix4 modelMatrix;
+    public static final float X = 20;
+    public static final float Y = 0;
+    public static final float Z = 0;
     
     public AbandonedHouse() {
         this.modelMatrix = new Matrix4();

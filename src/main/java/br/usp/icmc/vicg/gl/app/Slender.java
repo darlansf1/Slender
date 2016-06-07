@@ -28,7 +28,15 @@ public class Slender {
         return modelMatrix;
     }
     
-    public boolean place(float x, float z, float xDir, float zDir, float maxDistance){
+    public float getX() {
+        return x;
+    }
+
+    public float getZ() {
+        return z;
+    }
+    
+    public boolean place(float x, float z, float xDir, float zDir, float maxDistance, Scene scene){
         float deltaz = (z-this.z);
         float deltax = (x-this.x);
         //if(Math.abs(deltax) <= 0.000001)
@@ -47,7 +55,7 @@ public class Slender {
                 firstMet = false;
                 closenessFactor+=CLOSENESS_STEP;
             }else if(closenessFactor >= MAX_CLOSENESS){
-                //termina jogo
+                scene.endGame(false);
                 closenessFactor = CLOSENESS_STEP;
             }
         }
@@ -57,9 +65,9 @@ public class Slender {
         //System.out.println("x: "+this.x);
         //System.out.println("z: "+this.z);
         modelMatrix.loadIdentity();
-        modelMatrix.translate(this.x, -0.1f, this.z);//faz andar em direcao ao jogador
+        modelMatrix.translate(this.x, -0.7f, this.z);//faz andar em direcao ao jogador
         modelMatrix.rotate(180-(float)Math.toDegrees(angle), 0, 1f, 0);
-        modelMatrix.scale(0.3f, 0.3f, 0.3f);
+        modelMatrix.scale(0.5f, 0.5f, 0.5f);
         //modelMatrix.rotate(beta, 0, 1.0f, 0);
         //modelMatrix.rotate(alpha, 1.0f, 0, 0);
         //modelMatrix.translate(3, 0, 1.5f);
@@ -69,8 +77,8 @@ public class Slender {
         return toDraw;
     }
 
-    void draw(float x, float z, float xDir, float zDir, float maxDistance) {
-        if(this.place(x, z, xDir, zDir, maxDistance))
+    void draw(float x, float z, float xDir, float zDir, float maxDistance, Scene scene) {
+        if(this.place(x, z, xDir, zDir, maxDistance, scene))
             model.draw();
     }
 
