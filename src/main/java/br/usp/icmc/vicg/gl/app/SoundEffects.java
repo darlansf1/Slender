@@ -13,7 +13,12 @@ import javazoom.jl.player.Player;
 public class SoundEffects {
     private float deltax = 0;
     private float deltaz = 0;
+    private boolean gameOver = false;
 
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+    
     public void setDeltax(float deltax) {
         this.deltax = deltax;
     }
@@ -43,6 +48,10 @@ public class SoundEffects {
         public void run() {
             
             while(true){
+                if(gameOver){
+                    step.pauseSound();
+                    breathing.pauseSound();
+                }
                 if(Math.abs(deltax) < 0.000001 && Math.abs(deltaz) < 0.000001){
                     step.pauseSound();
                     breathing.playSound();
@@ -53,6 +62,20 @@ public class SoundEffects {
             }
         }
     }).start();
+  }
+  
+  public void playGameOverAudio(boolean hasWon){
+      String file = "./sounds/catra.mp3";
+      if(hasWon)
+        file = "./sounds/ines.mp3";
+      final Sound sound = new Sound(file);
+            
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sound.playSound();
+            }
+        }).start();
   }
   
   private class Sound{
@@ -69,6 +92,7 @@ public class SoundEffects {
                 System.out.println("pause");
                 player.close();
             }
+            
             running = false;
         }
         

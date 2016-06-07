@@ -1,10 +1,13 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.core.Light;
+import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.jwavefront.JWavefrontObject;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
 import br.usp.icmc.vicg.gl.model.Rectangle;
 import br.usp.icmc.vicg.gl.model.Sphere;
+import br.usp.icmc.vicg.gl.model.TextureRectangle;
+import br.usp.icmc.vicg.gl.model.TextureSimpleModel;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -38,8 +41,9 @@ import javax.swing.JFrame;
 
 public class Scene extends KeyAdapter implements GLEventListener {
 
-  private final Shader shader; // Gerenciador dos shaders
- // private final Matrix4 modelMatrix;
+  private Shader shader; // Gerenciador dos shaders
+  private final Matrix4 modelMatrix;
+  private final Material material;
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
   private final Scenario scenario;
@@ -47,6 +51,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private final Border border;
   private final AbandonedHouse house;
   private final Light light;
+  private final TextureSimpleModel loseScreen;
+  private final TextureSimpleModel winScreen;
   //private final Rectangle floor;
   private float aspect;
   private SoundEffects sounds;
@@ -64,7 +70,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     // Carrega os shaders
     shader = ShaderFactory.getInstance(ShaderType.SPOTLIGHT_SHADER);
     //shader = ShaderFactory.getInstance(ShaderType.SPOTLIGHT_SHADER);
-   // modelMatrix = new Matrix4();
+    modelMatrix = new Matrix4();
     projectionMatrix = new Matrix4();
     viewMatrix = new Matrix4();
 
@@ -80,6 +86,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     virastep = 0;
     campodevisao = 20;
     cimastep = 0;
+    loseScreen = new TextureRectangle();
+    winScreen = new TextureRectangle();
+    material = new Material();
   }
   
   public void setAspect(float aspect){
@@ -110,7 +119,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     shader.bind();
 
     //inicializa a matrix Model and Projection
-    //modelMatrix.init(gl, shader.getUniformLocation("u_modelMatrix"));
+    modelMatrix.init(gl, shader.getUniformLocation("u_modelMatrix"));
     projectionMatrix.init(gl, shader.getUniformLocation("u_projectionMatrix"));
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
@@ -129,9 +138,25 @@ public class Scene extends KeyAdapter implements GLEventListener {
     light.setLinearAttenuation(0.05f);
     light.setQuadraticAttenuation(0.03f);
     light.init(gl, shader);
+    material.init(gl, shader);
     
     sounds = new SoundEffects();
     sounds.playSoundEffects();
+    
+    System.out.println(System.getProperty("user.dir"));
+    loseScreen.init(gl, shader);
+    try {
+      loseScreen.loadTexture("./images/catra.jpg");
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+    
+    winScreen.init(gl, shader);
+    try {
+      winScreen.loadTexture("./images/ines.jpg");
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
   }
   
   private void initModel(GL3 gl, Matrix4 modelMatrix, JWavefrontObject model){
@@ -146,14 +171,16 @@ public class Scene extends KeyAdapter implements GLEventListener {
     }
   }
 
+  GL3 gl;
   float x = 0;
   float z = 0;
   float deltax = 0, deltaz = 0;
+  Boolean lost_or_won = null;
   @Override
   public void display(GLAutoDrawable drawable) {
     // Recupera o pipeline
     GL3 gl = drawable.getGL().getGL3();
-
+    this.gl = gl;
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
     
@@ -181,33 +208,81 @@ public class Scene extends KeyAdapter implements GLEventListener {
     //zera movimento de camera
     frentestep = 0;
     
-    projectionMatrix.loadIdentity();
-    projectionMatrix.perspective(60, this.aspect, 0.01f, campodevisao);
-    projectionMatrix.bind();
+    if(lost_or_won == null){
+        projectionMatrix.loadIdentity();
+        projectionMatrix.perspective(60, this.aspect, 0.01f, campodevisao);
+        projectionMatrix.bind();
 
-    viewMatrix.loadIdentity();
-    viewMatrix.lookAt(
-            0, 0, 0, //onde vc esta
-            cosBeta, cimastep, sinBeta, //pra onde olha
-            0, 1, 0); //pra cima
-    viewMatrix.translate(x, y, z); //seta posicao da camera
-    viewMatrix.bind();
-    light.bind();
-    
-    scenario.draw(-x, -z, campodevisao);
-    
-    slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
-    //border.draw();
-    house.draw(20.0f, 0, 0);
-    
+        viewMatrix.loadIdentity();
+        viewMatrix.lookAt(
+                0, 0, 0, //onde vc esta
+                cosBeta, cimastep, sinBeta, //pra onde olha
+                0, 1, 0); //pra cima
+        viewMatrix.translate(x, y, z); //seta posicao da camera
+        viewMatrix.bind();
+        light.bind();
 
+        scenario.draw(-x, -z, campodevisao);
+
+        slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
+        //border.draw();
+        house.draw(20.0f, 0, 0);
+    }else
+        endGame(lost_or_won);
     // ForÃ§a execuÃ§Ã£o das operaÃ§Ãµes declaradas
     gl.glFlush();
   }
   
   public boolean endGame(boolean hasWon){
       try{
-        
+        if(lost_or_won == null){
+            sounds.playGameOverAudio(hasWon);
+            shader = ShaderFactory.getInstance(ShaderType.TEXTURE_SHADER);
+            //inicializa os shaders
+            shader.init(gl);
+
+            //ativa os shaders
+            shader.bind();
+
+            projectionMatrix.loadIdentity();
+            projectionMatrix.ortho(
+                    -1, 1,
+                    -1, 1,
+                    -2, 2);
+            projectionMatrix.bind();
+
+            viewMatrix.loadIdentity();
+            viewMatrix.lookAt(
+                    0, 0, 1,
+                    0, 0, 0,
+                    0, 1, 0);
+            viewMatrix.bind();
+
+            light.init(gl, shader);
+            light.setPosition(new float[]{2.0f, 2.0f, 2.0f, 1.0f});
+            light.setAmbientColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+            light.setDiffuseColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
+            light.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
+            light.bind();
+
+            material.setAmbientColor(new float[]{1.0f, 1.0f, 1.0f, 0.25f});
+            material.setDiffuseColor(new float[]{0.0f, 0.0f, 1.0f, 0.25f});
+            material.setSpecularColor(new float[]{0.9f, 0.9f, 0.9f, 0.25f});
+            material.setSpecularExponent(32);
+            material.bind();
+        }
+        modelMatrix.loadIdentity();
+        modelMatrix.bind();
+
+
+        lost_or_won = hasWon;
+        if(lost_or_won){
+            winScreen.bind();
+            winScreen.draw();
+        }else{
+            loseScreen.bind();
+            loseScreen.draw();
+        }
       }catch(Exception e){
           e.printStackTrace();
       }

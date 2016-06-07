@@ -55,7 +55,7 @@ public class Scenario {
             for(int j = 0; j < map.get(i).size(); j++){
                 if(map.get(i).get(j).get(0) >= x-delta && map.get(i).get(j).get(0) <= x+delta
                         && map.get(i).get(j).get(1) >= z-delta && map.get(i).get(j).get(1) <= z+delta)
-                    drawTree(map.get(i).get(j).get(0), -0.1f, map.get(i).get(j).get(1), theta.get(count), scalex.get(count), scaley.get(count));
+                    drawTree(map.get(i).get(j).get(0), -0.2f, map.get(i).get(j).get(1), theta.get(count), scalex.get(count), scaley.get(count));
                 count++;
             }
         
@@ -125,6 +125,8 @@ public class Scenario {
                     return scene.endGame(true);
                 if(Math.abs(x-slender.getX()) < minDistance && Math.abs(z-slender.getZ()) < minDistance)
                     return scene.endGame(false);
+                if(x <= min || x >= max || z <= min || z >= max)
+                    return true;
             }
         return false;
     }
