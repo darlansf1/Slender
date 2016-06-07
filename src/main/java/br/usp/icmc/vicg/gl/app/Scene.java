@@ -48,6 +48,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private final Material material;
   private final Scenario scenario;
   private final Slender slender;
+  private final Flashlight flashlight;
   private final Border border;
   private final AbandonedHouse house;
   private final Light light;
@@ -62,6 +63,10 @@ public class Scene extends KeyAdapter implements GLEventListener {
     private float virastep;
     private float campodevisao;
     private float cimastep;
+    
+    /*coordenadas*/
+    private float x;
+    private float z;
 
   public Scene(float aspect) {
     this.aspect = aspect;
@@ -76,6 +81,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     //model = new JWavefrontObject(new File("./data/VW-new-beetle.obj"));
     scenario = new Scenario(-100.0f, 100.0f);
     slender = new Slender();
+    flashlight = new Flashlight();
     border = new Border();
     house = new AbandonedHouse();
     light = new Light();
@@ -88,6 +94,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     virastep = 0;
     campodevisao = 20;
     cimastep = 0;
+    
+    x = 0;
+    z = 0;
   }
   
   public void setAspect(float aspect){
@@ -128,6 +137,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     initModel(gl, scenario.getModelMatrix(), scenario.getModel());
     scenario.getWorld().init(gl, shader);
 
+    initModel(gl, flashlight.getModelMatrix(), flashlight.getModel());
+    
     //init the light
     light.setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
     light.setAmbientColor(new float[]{0.025f, 0.025f, 0.025f, 1.0f});
@@ -170,8 +181,6 @@ public class Scene extends KeyAdapter implements GLEventListener {
   }
 
   GL3 gl;
-  float x = 0;
-  float z = 0;
   float deltax = 0, deltaz = 0;
   Boolean lost_or_won = null;
   @Override
@@ -223,6 +232,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
         scenario.draw(-x, -z, campodevisao);
 
+        flashlight.draw(x, y, z);
+        
         slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
         //border.draw();
         house.draw(20.0f, 0, 0);
@@ -298,6 +309,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     slender.dispose();
     border.dispose();
     scenario.dispose();
+    flashlight.dispose();
   }
         
     private void processKeyEvents(){

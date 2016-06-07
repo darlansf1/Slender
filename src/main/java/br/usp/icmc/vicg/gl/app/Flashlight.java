@@ -13,16 +13,13 @@ import java.io.File;
  *
  * @author Leonardo
  */
-public class AbandonedHouse {
+public class Flashlight {
     private final JWavefrontObject model;
     private final Matrix4 modelMatrix;
-    public static final float X = 20;
-    public static final float Y = 0;
-    public static final float Z = 0;
     
-    public AbandonedHouse() {
+    public Flashlight() {
         this.modelMatrix = new Matrix4();
-        this.model = new JWavefrontObject(new File("./models/Farmhouse/OBJ/Farmhouse_OBJ.obj"));
+        this.model = new JWavefrontObject(new File("./models/Flashlight/Flashlight.obj"));
     }
     
     public JWavefrontObject getModel() {
@@ -33,15 +30,15 @@ public class AbandonedHouse {
         return modelMatrix;
     }
     
-    public void draw(float x, float y, float z){
+    void draw(float x, float y, float z) {
         modelMatrix.loadIdentity();
-        modelMatrix.translate(x, y, z);
-        modelMatrix.rotate(90.0f, 0.0f, 1.0f, 0.0f);
-        modelMatrix.scale(4.0f, 4.0f, 4.0f);
+        modelMatrix.translate(x+5.0f, y-2.0f, z+0.0f);
+        modelMatrix.rotate(90, 0.0f, 1.0f, 0.0f);
+        modelMatrix.scale(0.2f, 0.2f, 0.2f);
         modelMatrix.bind();
         model.draw();
     }
-    
+
     void dispose() {
         model.dispose();
     }
