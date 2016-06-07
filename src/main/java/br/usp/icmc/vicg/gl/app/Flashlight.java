@@ -32,7 +32,7 @@ public class Flashlight {
     
     void draw(float x, float y, float z) {
         modelMatrix.loadIdentity();
-        modelMatrix.translate(0.6f, -0.8f, 0.0f);
+        modelMatrix.translate(x+5.0f, y-2.0f, z+0.0f);
         modelMatrix.rotate(90, 0.0f, 1.0f, 0.0f);
         modelMatrix.scale(0.2f, 0.2f, 0.2f);
         modelMatrix.bind();

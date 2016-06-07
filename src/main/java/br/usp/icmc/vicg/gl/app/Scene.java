@@ -58,6 +58,10 @@ public class Scene extends KeyAdapter implements GLEventListener {
     private float virastep;
     private float campodevisao;
     private float cimastep;
+    
+    /*coordenadas*/
+    private float x;
+    private float z;  
 
   public Scene(float aspect) {
     this.aspect = aspect;
@@ -82,6 +86,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     virastep = 0;
     campodevisao = 20;
     cimastep = 0;
+    
+    x = 0;
+    z = 0;  
   }
   
   public void setAspect(float aspect){
@@ -149,9 +156,6 @@ public class Scene extends KeyAdapter implements GLEventListener {
     }
   }
 
-  float x = 0;
-  float z = 0;
-  float deltax = 0, deltaz = 0;
   @Override
   public void display(GLAutoDrawable drawable) {
     // Recupera o pipeline
@@ -165,8 +169,6 @@ public class Scene extends KeyAdapter implements GLEventListener {
     float y = 0.5f; // altura da camera
     float cosBeta = (float)Math.cos(Math.toRadians(virastep)); // vira
     float sinBeta = (float)Math.sin(Math.toRadians(virastep));
-    float cosBetaComp = (float)Math.cos(Math.toRadians(virastep-180)); // vira
-    float sinBetaComp = (float)Math.sin(Math.toRadians(virastep-180));
     float newx = x+(frentestep*cosBeta);
     float newz = z+(frentestep*sinBeta);
     float deltax = newx-x;
@@ -197,7 +199,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix.bind();
     light.bind();
     
-    scenario.draw(-x, -z, campodevisao);
+    //scenario.draw(-x, -z, campodevisao);
     
     slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
     
