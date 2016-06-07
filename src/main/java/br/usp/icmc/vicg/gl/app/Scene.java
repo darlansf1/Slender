@@ -196,8 +196,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
     scenario.draw(-x, -z, campodevisao);
     
-    slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao);
-    //border.draw();
+    slender.draw(-x, -z, cosBeta, sinBeta, campodevisao);
     house.draw(20.0f, 0, 0);
     
 
@@ -233,14 +232,18 @@ public class Scene extends KeyAdapter implements GLEventListener {
         if (pressedKeys.containsKey(KeyEvent.VK_S) && pressedKeys.get(KeyEvent.VK_S)) // olha pra baixo
             if (cimastep-step >= -1.0)
                 cimastep -= step;
-        if (pressedKeys.containsKey(KeyEvent.VK_A) && pressedKeys.get(KeyEvent.VK_A)) // vira pra esquerda
-            virastep = virastep - 10*step;
-        if (pressedKeys.containsKey(KeyEvent.VK_D) && pressedKeys.get(KeyEvent.VK_D)) // vira pra direita
-            virastep = virastep + 10*step;
         if (pressedKeys.containsKey(KeyEvent.VK_UP) && pressedKeys.get(KeyEvent.VK_UP)) // anda pra frente
-            frentestep = - step;
+            frentestep = -step;
         if (pressedKeys.containsKey(KeyEvent.VK_DOWN) && pressedKeys.get(KeyEvent.VK_DOWN)) // anda pra tras
-            frentestep = step;        
+            frentestep = +step;  
+        if (pressedKeys.containsKey(KeyEvent.VK_A) && pressedKeys.get(KeyEvent.VK_A)){ // vira pra esquerda
+            virastep = virastep - 10*step;
+            frentestep /= 2.0f;
+        }
+        if (pressedKeys.containsKey(KeyEvent.VK_D) && pressedKeys.get(KeyEvent.VK_D)){ // vira pra direita
+            virastep = virastep + 10*step;
+            frentestep /= 2.0f;
+        }
     }
   
   @Override
