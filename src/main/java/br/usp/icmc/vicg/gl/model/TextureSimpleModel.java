@@ -64,7 +64,6 @@ public abstract class TextureSimpleModel {
 
   public void loadTexture(String filename) throws IOException {
     BufferedImage image = ImageIO.read(getClass().getClassLoader().getResourceAsStream(filename));
-    //BufferedImage image = ImageIO.read(new File(filename));
     ImageUtil.flipImageVertically(image); //vertically flip the image
 
     texturedata = AWTTextureIO.newTexture(GLProfile.get(GLProfile.GL3), image, true);

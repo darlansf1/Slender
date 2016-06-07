@@ -1,8 +1,8 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.core.Light;
-import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.jwavefront.JWavefrontObject;
+import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
 import br.usp.icmc.vicg.gl.model.Rectangle;
 import br.usp.icmc.vicg.gl.model.Sphere;
@@ -43,9 +43,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
   private Shader shader; // Gerenciador dos shaders
   private final Matrix4 modelMatrix;
-  private final Material material;
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
+  private final Material material;
   private final Scenario scenario;
   private final Slender slender;
   private final Border border;
@@ -53,7 +53,6 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private final Light light;
   private final TextureSimpleModel loseScreen;
   private final TextureSimpleModel winScreen;
-  //private final Rectangle floor;
   private float aspect;
   private SoundEffects sounds;
   
@@ -80,15 +79,15 @@ public class Scene extends KeyAdapter implements GLEventListener {
     border = new Border();
     house = new AbandonedHouse();
     light = new Light();
-    //floor = new Rectangle();
+    
+    loseScreen = new TextureRectangle();
+    winScreen = new TextureRectangle();
+    material = new Material();
 
     frentestep = 0;
     virastep = 0;
     campodevisao = 20;
     cimastep = 0;
-    loseScreen = new TextureRectangle();
-    winScreen = new TextureRectangle();
-    material = new Material();
   }
   
   public void setAspect(float aspect){
@@ -143,7 +142,6 @@ public class Scene extends KeyAdapter implements GLEventListener {
     sounds = new SoundEffects();
     sounds.playSoundEffects();
     
-    System.out.println(System.getProperty("user.dir"));
     loseScreen.init(gl, shader);
     try {
       loseScreen.loadTexture("./images/catra.jpg");
@@ -181,6 +179,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     // Recupera o pipeline
     GL3 gl = drawable.getGL().getGL3();
     this.gl = gl;
+
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
     
@@ -229,6 +228,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
         house.draw(20.0f, 0, 0);
     }else
         endGame(lost_or_won);
+
     // ForÃ§a execuÃ§Ã£o das operaÃ§Ãµes declaradas
     gl.glFlush();
   }

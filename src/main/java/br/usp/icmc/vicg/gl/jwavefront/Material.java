@@ -21,6 +21,10 @@ public class Material {
         this.specular = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
     }
 
+    public Material() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public void dump() {
         System.out.println("Material name: " + name);
         System.out.println("Kd: (" + diffuse[0] + "," + diffuse[1] + "," + diffuse[2] + "," + diffuse[3] + ")");
