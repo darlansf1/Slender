@@ -65,9 +65,9 @@ public class Slender {
         //System.out.println("x: "+this.x);
         //System.out.println("z: "+this.z);
         modelMatrix.loadIdentity();
-        modelMatrix.translate(this.x, -0.7f, this.z);//faz andar em direcao ao jogador
+        modelMatrix.translate(this.x, -0.8f, this.z);//faz andar em direcao ao jogador
         modelMatrix.rotate(180-(float)Math.toDegrees(angle), 0, 1f, 0);
-        modelMatrix.scale(0.5f, 0.5f, 0.5f);
+        modelMatrix.scale(0.7f, 0.7f, 0.7f);
         //modelMatrix.rotate(beta, 0, 1.0f, 0);
         //modelMatrix.rotate(alpha, 1.0f, 0, 0);
         //modelMatrix.translate(3, 0, 1.5f);

@@ -85,7 +85,6 @@ public class Scene extends KeyAdapter implements GLEventListener {
     scenario = new Scenario(-100.0f, 100.0f);
     slender = new Slender();
     flashlight = new Flashlight();
-    floor = new Floor(-0.5f, -0.5f, 0.5f, 0.5f);
     house = new AbandonedHouse();
     light = new Light();
     
@@ -97,6 +96,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     virastep = 0;
     campodevisao = 20;
     cimastep = 0;
+    
+    floor = new Floor(-0.5f, -0.5f, 0.5f, 0.5f, scenario.getWorldSize());
     
     x = 0;
     z = 0;
@@ -139,10 +140,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     initModel(gl, slender.getModelMatrix(), slender.getModel());
     initModel(gl, house.getModelMatrix(), house.getModel());
     initModel(gl, scenario.getModelMatrix(), scenario.getModel());
-    scenario.getWorld().init(gl, shader);
     initModel(gl, flashlight.getModelMatrix(), flashlight.getModel());
     floor.init(gl, shader);
-    floor.loadTexture("./images/grass.png");
+    floor.loadTexture("./images/156.jpg");
     
     //init the light
     light.setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
@@ -243,7 +243,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
         //border.draw();
         house.draw(20.0f, 0, 0);        
         
-        floor.draw();
+        floor.draw(-x, -z, campodevisao);
+        //floor.draw(x, z);
     }else
         endGame(lost_or_won);
 

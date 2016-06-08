@@ -23,12 +23,26 @@ import javax.media.opengl.GL3;
  * @author Leonardo
  */
 public class Floor{
+    private ArrayList<ArrayList<ArrayList<Float>>> positions;
     private final Matrix4 modelMatrix;
     private TextureRectangle rectangle;
     
-    public Floor(float xmin, float ymin, float xmax, float ymax){
+    public Floor(float xmin, float ymin, float xmax, float ymax, float worldSize){
         this.modelMatrix = new Matrix4();
         this.rectangle = new TextureRectangle(xmin, ymin, xmax, ymax);
+        this.positions = new ArrayList<>();
+
+        int min = (int)(-worldSize/2);
+        int max = -min;
+        
+        for(int x = min; x < max; x++){
+            positions.add(new ArrayList<ArrayList<Float>>());
+            for(int y = min; y < max; y++){
+                positions.get(x-min).add(new ArrayList<Float>());
+                positions.get(x-min).get(y-min).add((float)x);
+                positions.get(x-min).get(y-min).add((float)y);
+            }
+        }
     }
     
     public void init(GL3 gl, Shader shader){
@@ -44,11 +58,20 @@ public class Floor{
       }
     }
 
-    public void draw() {
+    public void draw(float x, float z, float delta){
+        for(int i = 0; i < positions.size(); i++)
+            for(int j = 0; j < positions.get(i).size(); j++){
+                if(positions.get(i).get(j).get(0) >= x-delta && positions.get(i).get(j).get(0) <= x+delta
+                        && positions.get(i).get(j).get(1) >= z-delta && positions.get(i).get(j).get(1) <= z+delta)
+                    draw(positions.get(i).get(j).get(0), positions.get(i).get(j).get(1));
+            }
+    }
+    
+    public void draw(float x, float z) {
         modelMatrix.loadIdentity();
-        modelMatrix.translate(0.0f, -1.6f, 0.0f);
+        modelMatrix.translate(x, -1.6f, z);
         modelMatrix.rotate(180, 1.0f, 0.0f, 0.0f);
-        modelMatrix.scale(100.0f, 100.0f, 100.0f);
+        modelMatrix.scale(1.0f, 1.0f, 1.0f);
         modelMatrix.bind();
         rectangle.bind();
         rectangle.draw();
