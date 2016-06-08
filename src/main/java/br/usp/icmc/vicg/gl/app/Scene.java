@@ -138,9 +138,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
     initModel(gl, slender.getModelMatrix(), slender.getModel());
+    initModel(gl, flashlight.getModelMatrix(), flashlight.getModel());
     initModel(gl, house.getModelMatrix(), house.getModel());
     initModel(gl, scenario.getModelMatrix(), scenario.getModel());
-    initModel(gl, flashlight.getModelMatrix(), flashlight.getModel());
     floor.init(gl, shader);
     floor.loadTexture("./images/156.jpg");
     
