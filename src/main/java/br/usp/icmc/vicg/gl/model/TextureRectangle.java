@@ -42,6 +42,37 @@ public class TextureRectangle extends TextureSimpleModel {
       0, 0
     };
   }
+  
+  public TextureRectangle(float xmin, float zmin, float xmax, float zmax) {
+    vertex_buffer = new float[]{
+      xmin, 0.0f, zmin,
+      xmax, 0.0f, zmin,
+      xmax, 0.0f, zmax,
+      
+      xmax, 0.0f, zmax,
+      xmin, 0.0f, zmax,
+      xmin, 0.0f, zmin};
+
+    normal_buffer = new float[]{
+      0, -1, 0,
+      0, -1, 0,
+      0, -1, 0,
+      
+      0, -1, 0,
+      0, -1, 0,
+      0, -1, 0
+    };
+
+    texture_buffer = new float[]{
+      0, 0,
+      1, 0,
+      1, 1,
+      
+      1, 1,
+      0, 1,
+      0, 0
+    };
+  }
 
   @Override
   public void draw() {

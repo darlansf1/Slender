@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 
 public class Scene extends KeyAdapter implements GLEventListener {
@@ -49,7 +50,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
   private final Scenario scenario;
   private final Slender slender;
   private final Flashlight flashlight;
-  private final Border border;
+  private final Floor floor;
   private final AbandonedHouse house;
   private final Light light;
   private final TextureSimpleModel loseScreen;
@@ -67,6 +68,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     /*coordenadas*/
     private float x;
     private float z;
+    
+    private boolean messageshown;
 
   public Scene(float aspect) {
     this.aspect = aspect;
@@ -82,7 +85,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     scenario = new Scenario(-100.0f, 100.0f);
     slender = new Slender();
     flashlight = new Flashlight();
-    border = new Border();
+    floor = new Floor(-0.5f, -0.5f, 0.5f, 0.5f);
     house = new AbandonedHouse();
     light = new Light();
     
@@ -97,6 +100,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
     x = 0;
     z = 0;
+    
+    messageshown = false;
   }
   
   public void setAspect(float aspect){
@@ -132,12 +137,12 @@ public class Scene extends KeyAdapter implements GLEventListener {
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
     initModel(gl, slender.getModelMatrix(), slender.getModel());
-    //initModel(gl, border.getModelMatrix(), border.getModel());
     initModel(gl, house.getModelMatrix(), house.getModel());
     initModel(gl, scenario.getModelMatrix(), scenario.getModel());
     scenario.getWorld().init(gl, shader);
-
     initModel(gl, flashlight.getModelMatrix(), flashlight.getModel());
+    floor.init(gl, shader);
+    floor.loadTexture("./images/grass.png");
     
     //init the light
     light.setPosition(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
@@ -236,7 +241,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
         
         slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
         //border.draw();
-        house.draw(20.0f, 0, 0);
+        house.draw(20.0f, 0, 0);        
+        
+        floor.draw();
     }else
         endGame(lost_or_won);
 
@@ -284,15 +291,25 @@ public class Scene extends KeyAdapter implements GLEventListener {
         }
         modelMatrix.loadIdentity();
         modelMatrix.bind();
-
-
+        
         lost_or_won = hasWon;
         if(lost_or_won){
             winScreen.bind();
             winScreen.draw();
+            if (!messageshown){
+                JOptionPane.showMessageDialog(null, "\"Graças a Deus, você venceu! "
+                    + "Em nome de Jesus, Graças a Deus!\" -- Ines Brasil\nProduzido por Sons of Catra");
+                messageshown = true;
+            }
         }else{
             loseScreen.bind();
             loseScreen.draw();
+            if (!messageshown){
+                JOptionPane.showMessageDialog(null, "Você perdeu!\n"
+                    + "Aprenda mais sobre os ensinamentos de Mr. Catra e tente novamente...\n"
+                    + "Produzido por Sons of Catra");
+                messageshown = true;
+            }
         }
       }catch(Exception e){
           e.printStackTrace();
@@ -307,9 +324,12 @@ public class Scene extends KeyAdapter implements GLEventListener {
   @Override
   public void dispose(GLAutoDrawable drawable) {
     slender.dispose();
-    border.dispose();
+    floor.dispose();
     scenario.dispose();
     flashlight.dispose();
+    loseScreen.dispose();
+    winScreen.dispose();
+    house.dispose();
   }
         
     private void processKeyEvents(){
@@ -319,9 +339,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
         else
             step = 0.1f; //andando deboas pelo vale das sombras
         
-        if (pressedKeys.containsKey(KeyEvent.VK_PAGE_UP) && pressedKeys.get(KeyEvent.VK_PAGE_UP)) //aumenta campo de visao
+        if (pressedKeys.containsKey(KeyEvent.VK_PAGE_UP) && pressedKeys.get(KeyEvent.VK_PAGE_UP)) //diminui campo de visao
             campodevisao = campodevisao * 0.809f;
-        if (pressedKeys.containsKey(KeyEvent.VK_PAGE_DOWN) && pressedKeys.get(KeyEvent.VK_PAGE_DOWN)) //diminui campo de visao
+        if (pressedKeys.containsKey(KeyEvent.VK_PAGE_DOWN) && pressedKeys.get(KeyEvent.VK_PAGE_DOWN)) //aumenta campo de visao
             campodevisao = campodevisao * 1.1f;
         if (pressedKeys.containsKey(KeyEvent.VK_W) && pressedKeys.get(KeyEvent.VK_W)) // olha pra cima
             if (cimastep+step <= 1.0)
@@ -330,9 +350,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
             if (cimastep-step >= -1.0)
                 cimastep -= step;
         if (pressedKeys.containsKey(KeyEvent.VK_A) && pressedKeys.get(KeyEvent.VK_A)) // vira pra esquerda
-            virastep = virastep - 10*step;
+            virastep = virastep - 20*step;
         if (pressedKeys.containsKey(KeyEvent.VK_D) && pressedKeys.get(KeyEvent.VK_D)) // vira pra direita
-            virastep = virastep + 10*step;
+            virastep = virastep + 20*step;
         if (pressedKeys.containsKey(KeyEvent.VK_UP) && pressedKeys.get(KeyEvent.VK_UP)) // anda pra frente
             frentestep = - step;
         if (pressedKeys.containsKey(KeyEvent.VK_DOWN) && pressedKeys.get(KeyEvent.VK_DOWN)) // anda pra tras
