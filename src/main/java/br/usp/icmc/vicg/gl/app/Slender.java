@@ -54,6 +54,7 @@ public class Slender {
                 this.z = z+zDir*maxDistance/closenessFactor;
                 firstMet = false;
                 closenessFactor+=CLOSENESS_STEP;
+                scene.turnLightOff();
             }else if(closenessFactor >= MAX_CLOSENESS){
                 scene.endGame(false);
                 closenessFactor = CLOSENESS_STEP;

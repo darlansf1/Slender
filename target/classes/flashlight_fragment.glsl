@@ -52,7 +52,6 @@ void main(void){
 		    else
 		        diffuse = intensity * u_light.diffuseColor * u_material.diffuseColor;
 			
-			    
 			if (intensity > 0.0){
 				vec3 r = reflect(-l, n);
 				float specExponent = pow(max(dot(v, r), 0.0), u_material.specularExponent);
