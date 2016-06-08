@@ -73,6 +73,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
     private boolean lightIsBlinking;
     private int blinkLightCounter;
+    
+    private int steps;
 
   public Scene(float aspect) {
     this.aspect = aspect;
@@ -102,6 +104,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
     lightIsBlinking = false;
     blinkLightCounter = 0;
+    
+    steps = 0;
     
     floor = new Floor(-0.5f, -0.5f, 0.5f, 0.5f, scenario.getWorldSize());
     
@@ -202,10 +206,13 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
-    
+            
     processKeyEvents();
 
-    float y = 0.5f; // altura da camera
+    float y = (float) (0.35f+0.05f*Math.cos(Math.toRadians(steps)));;
+    if (Math.abs(frentestep) > 0)
+        steps += 15;
+    
     float cosBeta = (float)Math.cos(Math.toRadians(virastep)); // vira
     float sinBeta = (float)Math.sin(Math.toRadians(virastep));
     float cosBetaComp = (float)Math.cos(Math.toRadians(virastep-180)); // vira
@@ -228,7 +235,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     frentestep = 0;
     
     if (lightIsBlinking){
-        if (blinkLightCounter > 60){
+        if (blinkLightCounter > 45){
             turnLightOn();
             lightIsBlinking = false;
         }else
@@ -365,9 +372,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     private void processKeyEvents(){
         float step;
         if (pressedKeys.containsKey(KeyEvent.VK_SHIFT) && pressedKeys.get(KeyEvent.VK_SHIFT))
-            step = 0.2f; //correndo
+            step = 0.14f; //correndo
         else
-            step = 0.1f; //andando deboas pelo vale das sombras
+            step = 0.07f; //andando deboas pelo vale das sombras
         
         if (pressedKeys.containsKey(KeyEvent.VK_PAGE_UP) && pressedKeys.get(KeyEvent.VK_PAGE_UP)) //diminui campo de visao
             campodevisao = campodevisao * 0.809f;
