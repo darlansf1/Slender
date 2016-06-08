@@ -70,6 +70,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     private float z;
     
     private boolean messageshown;
+    
+    private boolean lightIsBlinking;
+    private int blinkLightCounter;
 
   public Scene(float aspect) {
     this.aspect = aspect;
@@ -96,6 +99,9 @@ public class Scene extends KeyAdapter implements GLEventListener {
     virastep = 0;
     campodevisao = 20;
     cimastep = 0;
+    
+    lightIsBlinking = false;
+    blinkLightCounter = 0;
     
     floor = new Floor(-0.5f, -0.5f, 0.5f, 0.5f, scenario.getWorldSize());
     
@@ -221,6 +227,14 @@ public class Scene extends KeyAdapter implements GLEventListener {
     //zera movimento de camera
     frentestep = 0;
     
+    if (lightIsBlinking){
+        if (blinkLightCounter > 60){
+            turnLightOn();
+            lightIsBlinking = false;
+        }else
+            blinkLightCounter += 1;
+    }
+    
     if(lost_or_won == null){
         projectionMatrix.loadIdentity();
         projectionMatrix.perspective(60, this.aspect, 0.01f, campodevisao);
@@ -250,6 +264,21 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
     // ForÃ§a execuÃ§Ã£o das operaÃ§Ãµes declaradas
     gl.glFlush();
+  }
+  
+  public void turnLightOff(){
+    light.setDiffuseColor(new float[]{0.2f, 0.2f, 0.2f, 1.0f});
+    light.setSpecularColor(new float[]{0.05f, 0.05f, 0.05f, 1.0f});
+    light.bind();
+    lightIsBlinking = true;
+    blinkLightCounter = 0;
+  }
+  
+  public void turnLightOn(){
+    light.setDiffuseColor(new float[]{0.8f, 0.8f, 0.8f, 1.0f});
+    light.setSpecularColor(new float[]{0.2f, 0.2f, 0.2f, 1.0f});
+    light.bind();
+    lightIsBlinking = false;
   }
   
   public boolean endGame(boolean hasWon){
