@@ -185,9 +185,8 @@ public class Scene extends KeyAdapter implements GLEventListener {
     }
   }
 
-  GL3 gl;
-  float deltax = 0, deltaz = 0;
-  Boolean lost_or_won = null;
+  private GL3 gl;
+  private Boolean lost_or_won = null;
   @Override
   public void display(GLAutoDrawable drawable) {
     // Recupera o pipeline
@@ -237,7 +236,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
 
         scenario.draw(-x, -z, campodevisao);
 
-        flashlight.draw(x, y, z);
+        flashlight.draw(-x, y, -z, virastep, cimastep, cosBeta, sinBeta);
         
         slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
         //border.draw();
