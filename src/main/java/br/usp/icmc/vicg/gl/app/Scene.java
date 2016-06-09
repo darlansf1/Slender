@@ -214,8 +214,7 @@ public class Scene extends KeyAdapter implements GLEventListener {
     
     float cosBeta = (float)Math.cos(Math.toRadians(virastep)); // vira
     float sinBeta = (float)Math.sin(Math.toRadians(virastep));
-    float cosBetaComp = (float)Math.cos(Math.toRadians(virastep-180)); // vira
-    float sinBetaComp = (float)Math.sin(Math.toRadians(virastep-180));
+    
     float newx = x+(frentestep*cosBeta);
     float newz = z+(frentestep*sinBeta);
     float deltax = newx-x;
@@ -253,11 +252,12 @@ public class Scene extends KeyAdapter implements GLEventListener {
                 0, 1, 0); //pra cima
         viewMatrix.translate(x, y, z); //seta posicao da camera
         viewMatrix.bind();
-        light.bind();
 
         scenario.draw(-x, -z, campodevisao);
 
-        flashlight.draw(-x, y, -z, virastep, cimastep, cosBeta, sinBeta);
+        flashlight.draw(-x, y, -z, cosBeta, cimastep, sinBeta);
+        
+        light.bind();
         
         slender.draw(/*beta, alpha*/-x, -z, cosBeta, sinBeta, campodevisao, this);
         //border.draw();

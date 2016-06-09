@@ -69,7 +69,7 @@ public class Floor{
     
     public void draw(float x, float z) {
         modelMatrix.loadIdentity();
-        modelMatrix.translate(x, -1.6f, z);
+        modelMatrix.translate(x, -2f, z);
         modelMatrix.rotate(180, 1.0f, 0.0f, 0.0f);
         modelMatrix.scale(1.0f, 1.0f, 1.0f);
         modelMatrix.bind();

@@ -78,17 +78,21 @@ public class Scenario {
         ArrayList<ArrayList<ArrayList<Float>>> map = new ArrayList<ArrayList<ArrayList<Float>>>();
         this.worldSize = max-min;
         float houseSpace = 5.5f;
+        float minSpace = 1;
         
         for(float x = min; x < max; x += delta/2+Math.random()*2*delta){
             ArrayList<ArrayList<Float>> row = new ArrayList<ArrayList<Float>>();
             for(float z = min; z < max; z += delta/2+Math.random()*2*delta){
                 if(Math.abs(x-AbandonedHouse.X) < houseSpace && Math.abs(z-AbandonedHouse.Z) < houseSpace)
                     continue;
+                if(Math.abs(x) < minSpace && Math.abs(z) < minSpace)
+                    continue;
+                
                 ArrayList<Float> pair = new ArrayList<Float>();
                 pair.add(x);
                 pair.add(z);
                 this.theta.add(angle);
-                this.scaley.add(2f);
+                this.scaley.add(2.4f);
                 this.scalex.add(2f+2f*(float)Math.random());
                 angle += Math.random()*delta*10;
                 row.add(pair);
